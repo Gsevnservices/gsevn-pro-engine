@@ -1,0 +1,3671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GSEVN Capital — Pro Content Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700;900&family=DM+Mono:wght@300;400;500&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8C96A;
+  --gold-dim: #7A6128;
+  --gold-glow: rgba(201,168,76,0.15);
+  --black: #060606;
+  --s1: #0E0E0E;
+  --s2: #141414;
+  --s3: #1C1C1C;
+  --s4: #242424;
+  --border: #2C2C2C;
+  --border2: #383838;
+  --text: #EAE6DC;
+  --text2: #9A9488;
+  --text3: #5A5650;
+  --green: #2ECC71;
+  --red: #E74C3C;
+  --blue: #5B8DEF;
+  --orange: #F39C12;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* NOISE OVERLAY */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:0;
+  opacity:0.4;
+}
+
+/* HEADER */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6,6,6,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 36px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.logo-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+
+.logo-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.date-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 3px;
+}
+
+.pro-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  background: var(--gold-glow);
+  border: 1px solid var(--gold-dim);
+  padding: 4px 10px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--s1);
+  padding: 0 36px;
+  position: sticky;
+  top: 64px;
+  z-index: 99;
+}
+
+.tab {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding: 14px 20px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tab:hover { color: var(--text2); }
+.tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* MAIN LAYOUT */
+.workspace {
+  display: grid;
+  grid-template-columns: 260px 1fr 380px;
+  min-height: calc(100vh - 113px);
+  position: relative;
+  z-index: 1;
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--s1);
+  border-right: 1px solid var(--border);
+  padding: 24px 18px;
+  overflow-y: auto;
+}
+
+.sid-section {
+  margin-bottom: 24px;
+}
+
+.sid-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sid-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--s2);
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-size: 12px;
+  color: var(--text2);
+  user-select: none;
+}
+
+.chip.on {
+  border-color: var(--gold-dim);
+  background: var(--gold-glow);
+  color: var(--gold-light);
+}
+
+.chip:hover { border-color: var(--gold-dim); color: var(--text); }
+
+.chip-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--border2);
+  transition: background 0.18s;
+}
+
+.chip.on .chip-dot { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+
+.sel {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  padding: 9px 12px;
+  border-radius: 5px;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  margin-bottom: 8px;
+}
+.sel:focus { border-color: var(--gold-dim); }
+
+/* FETCH BTN */
+.fetch-btn {
+  width: 100%;
+  background: var(--gold);
+  color: var(--black);
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.fetch-btn:hover {
+  background: var(--gold-light);
+  box-shadow: 0 4px 24px rgba(201,168,76,0.3);
+  transform: translateY(-1px);
+}
+
+.fetch-btn:disabled {
+  background: var(--gold-dim);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* MAIN FEED */
+.feed {
+  padding: 28px 32px;
+  overflow-y: auto;
+}
+
+.feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.feed-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.feed-title em { color: var(--gold); font-style: normal; }
+
+/* NEWS CARD */
+.ncard {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.ncard::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: var(--gold);
+  transition: width 0.2s;
+  border-radius: 8px 0 0 8px;
+}
+
+.ncard:hover { border-color: var(--border2); transform: translateX(2px); }
+.ncard.sel { border-color: var(--gold-dim); background: rgba(201,168,76,0.04); }
+.ncard.sel::before { width: 3px; }
+
+.ncard-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.ncard-left { display: flex; align-items: center; gap: 8px; }
+
+.ntag {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.ntag-pe { background: rgba(201,168,76,0.12); color: var(--gold); }
+.ntag-vc { background: rgba(46,204,113,0.12); color: #4ADE80; }
+.ntag-ma { background: rgba(231,76,60,0.12); color: #F87171; }
+.ntag-ib { background: rgba(91,141,239,0.12); color: #93C5FD; }
+.ntag-macro { background: rgba(243,156,18,0.12); color: #FCD34D; }
+
+.nsource {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+}
+.nsource-link {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--gold-dim);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(201,168,76,0.4);
+  transition: color 0.15s, border-color 0.15s;
+}
+.nsource-link:hover { color: var(--gold-light); border-color: var(--gold); }
+.ndate-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  color: var(--text3);
+  background: var(--s3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
+/* VIRAL SCORE BADGE */
+.vscore {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+
+.vscore.high { color: var(--green); border-color: rgba(46,204,113,0.3); background: rgba(46,204,113,0.08); }
+.vscore.med { color: var(--orange); border-color: rgba(243,156,18,0.3); background: rgba(243,156,18,0.08); }
+.vscore.low { color: var(--text3); border-color: var(--border); background: var(--s2); }
+
+.vscore-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+.ncard-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.4;
+  margin-bottom: 5px;
+}
+
+.ncard-desc {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+.ncard-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.series-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--gold-dim);
+  background: var(--gold-glow);
+  border: 1px solid rgba(201,168,76,0.15);
+  padding: 2px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.viral-reason {
+  font-size: 11px;
+  color: var(--text3);
+  font-style: italic;
+}
+
+/* STATE BOXES */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.empty-icon { font-size: 44px; margin-bottom: 16px; opacity: 0.3; }
+.empty-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+.empty-desc { font-size: 12px; color: var(--text3); max-width: 280px; margin: 0 auto; line-height: 1.7; }
+
+/* SKELETON */
+.skel-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  position: relative;
+}
+.skel-card::after {
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+  animation: shim 1.4s infinite;
+}
+@keyframes shim { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+.sl { height: 10px; background: var(--s3); border-radius: 3px; margin-bottom: 8px; }
+.sl.s { width: 25%; }
+.sl.m { width: 60%; }
+.sl.l { width: 88%; }
+.sl.f { width: 100%; }
+.sl.h { height: 16px; }
+
+/* RIGHT PANEL */
+.panel {
+  background: var(--s1);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+.panel-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--s2);
+}
+
+.ptab {
+  flex: 1;
+  text-align: center;
+  padding: 12px 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.18s;
+}
+
+.ptab:hover { color: var(--text2); }
+.ptab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+.panel-body { padding: 20px 20px; }
+
+/* SCRIPT VIEW */
+.hook-score-bar {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+
+.hsb-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.hsb-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.hsb-score {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.hsb-score.good { color: var(--green); }
+.hsb-score.ok { color: var(--orange); }
+.hsb-score.bad { color: var(--red); }
+
+.progress-track {
+  height: 4px;
+  background: var(--s3);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--gold);
+  transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+
+.progress-fill.good { background: var(--green); }
+.progress-fill.ok { background: var(--orange); }
+.progress-fill.bad { background: var(--red); }
+
+.hsb-verdict {
+  font-size: 11px;
+  color: var(--text2);
+  font-style: italic;
+}
+
+.script-block {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.sb-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 10px;
+}
+
+.hook-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gold-light);
+  line-height: 1.45;
+}
+
+.bullets { list-style: none; }
+.bullets li {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.65;
+  padding: 6px 0 6px 16px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.bullets li:last-child { border-bottom: none; }
+.bullets li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+  font-size: 9px;
+  top: 9px;
+}
+
+.cta-text {
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 600;
+  font-style: italic;
+}
+
+.hook-alts {
+  margin-bottom: 12px;
+}
+
+.alt-hook {
+  background: var(--s3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.18s;
+  position: relative;
+}
+
+.alt-hook:hover {
+  border-color: var(--gold-dim);
+  background: var(--gold-glow);
+}
+
+.alt-hook-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 5px;
+}
+
+.alt-hook-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.use-hook-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  color: var(--gold-dim);
+  background: transparent;
+  border: 1px solid var(--gold-dim);
+  padding: 3px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+
+.alt-hook:hover .use-hook-btn { opacity: 1; }
+
+/* STORYBOARD */
+.phone-mock {
+  width: 220px;
+  margin: 0 auto 16px;
+  background: var(--black);
+  border: 2px solid var(--border2);
+  border-radius: 32px;
+  padding: 12px 8px;
+  position: relative;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.phone-notch {
+  width: 60px;
+  height: 6px;
+  background: var(--border2);
+  border-radius: 3px;
+  margin: 0 auto 10px;
+}
+
+.phone-screen {
+  background: #000;
+  border-radius: 20px;
+  aspect-ratio: 9/16;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.phone-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1208 50%, #0a0a0a 100%);
+}
+
+.phone-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.phone-overlay-lines {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 12px 10px;
+  width: 100%;
+}
+
+.phone-line {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  display: block;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+}
+
+.phone-line.accent { color: var(--gold-light); }
+
+.phone-logo {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 9px;
+  color: var(--gold-dim);
+  letter-spacing: 0.1em;
+}
+
+.phone-series-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 7px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(0,0,0,0.7);
+  border: 1px solid var(--gold-dim);
+  padding: 3px 7px;
+  border-radius: 3px;
+}
+
+.phone-timer {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  color: var(--text3);
+}
+
+/* SERIES BADGE */
+.series-display {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.series-icon { font-size: 24px; }
+
+.series-info {}
+.series-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gold-light);
+  margin-bottom: 2px;
+}
+.series-desc {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+/* CAPTION */
+.caption-area {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+
+.caption-txt {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.htag {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--gold-dim);
+  background: var(--gold-glow);
+  border: 1px solid rgba(201,168,76,0.12);
+  padding: 3px 7px;
+  border-radius: 3px;
+}
+
+/* ACTION BUTTONS */
+.action-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.abtn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 10px 8px;
+  border-radius: 5px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: center;
+}
+
+.abtn:hover { border-color: var(--gold-dim); color: var(--gold-light); background: var(--gold-glow); }
+.abtn.primary { background: var(--gold); color: var(--black); border-color: var(--gold); font-weight: 700; }
+.abtn.primary:hover { background: var(--gold-light); }
+.abtn.copied { border-color: var(--green); color: var(--green); }
+.abtn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.autofill-btn {
+  display: block;
+  width: calc(100% - 32px);
+  margin: 0 16px 16px;
+  padding: 13px 20px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.18) 0%, rgba(201,168,76,0.08) 100%);
+  border: 1px solid var(--gold-dim);
+  border-radius: 7px;
+  color: var(--gold-light);
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: center;
+}
+.autofill-btn:hover {
+  background: linear-gradient(135deg, rgba(201,168,76,0.28) 0%, rgba(201,168,76,0.14) 100%);
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(201,168,76,0.15);
+}
+.autofill-btn:active { transform: translateY(0); }
+
+/* ERROR */
+.err-box {
+  background: rgba(231,76,60,0.08);
+  border: 1px solid rgba(231,76,60,0.25);
+  color: #F87171;
+  padding: 10px 14px;
+  border-radius: 5px;
+  font-size: 11px;
+  margin-bottom: 12px;
+}
+
+/* SPINNER */
+.spin {
+  width: 13px; height: 13px;
+  border: 2px solid rgba(0,0,0,0.2);
+  border-top-color: var(--black);
+  border-radius: 50%;
+  animation: rot 0.7s linear infinite;
+  display: none;
+}
+.spin.on { display: inline-block; }
+@keyframes rot { to { transform: rotate(360deg); } }
+
+/* PANEL EMPTY */
+.panel-empty {
+  text-align: center;
+  padding: 60px 16px;
+}
+.pe-icon { font-size: 40px; margin-bottom: 14px; opacity: 0.2; }
+.pe-txt { font-size: 12px; color: var(--text3); line-height: 1.7; }
+
+/* LOADING PANEL */
+.panel-loading { padding: 20px; }
+.panel-skel { background: var(--s2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; overflow: hidden; position: relative; }
+.panel-skel::after { content:''; position:absolute; inset:0; background: linear-gradient(90deg,transparent,rgba(255,255,255,0.03),transparent); animation: shim 1.4s infinite; }
+
+/* VIRAL SCORE DETAIL */
+.viral-detail {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.viral-score-big {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.vsb-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.vsb-num.high { color: var(--green); }
+.vsb-num.med { color: var(--orange); }
+.vsb-num.low { color: var(--text3); }
+
+.vsb-info {}
+.vsb-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.vsb-sub { font-size: 11px; color: var(--text3); }
+
+.viral-factors { list-style: none; }
+.viral-factors li {
+  font-size: 11px;
+  color: var(--text2);
+  padding: 4px 0 4px 14px;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+}
+.viral-factors li:last-child { border-bottom: none; }
+.viral-factors li::before { content: '→'; position: absolute; left: 0; color: var(--gold-dim); }
+
+/* ── GRAPHIC GENERATOR ───────────────────────────────── */
+.graphic-workspace {
+  display: none;
+  grid-template-columns: 300px 1fr 420px;
+  min-height: calc(100vh - 113px);
+}
+.graphic-workspace.visible { display: grid; }
+
+/* hide the normal workspace when graphic tab is active */
+.workspace.hidden { display: none; }
+
+/* Graphic Sidebar */
+.gsb {
+  background: var(--s1);
+  border-right: 1px solid var(--border);
+  padding: 24px 18px;
+  overflow-y: auto;
+}
+
+/* Graphic main (fields) */
+.gmain {
+  padding: 28px 32px;
+  overflow-y: auto;
+  background: var(--black);
+}
+
+.gmain-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.gmain-title em { color: var(--gold); font-style: normal; }
+.gmain-sub {
+  font-size: 12px;
+  color: var(--text3);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+/* Template toggle buttons */
+.tpl-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.tpl-btn {
+  flex: 1;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 10px 8px;
+  border-radius: 5px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: center;
+}
+.tpl-btn:hover { border-color: var(--gold-dim); color: var(--text); }
+.tpl-btn.active {
+  background: var(--gold-glow);
+  border-color: var(--gold-dim);
+  color: var(--gold-light);
+}
+
+/* Input field group */
+.field-group {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 18px;
+  margin-bottom: 14px;
+}
+.field-group-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.field-group-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.field-row {
+  margin-bottom: 12px;
+}
+.field-row:last-child { margin-bottom: 0; }
+
+.field-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 5px;
+  display: block;
+}
+
+.finput {
+  width: 100%;
+  background: var(--s2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  padding: 9px 12px;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.18s;
+}
+.finput:focus { border-color: var(--gold-dim); }
+.finput::placeholder { color: var(--text3); }
+
+/* Chip pairs for stat rows */
+.chip-pair {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 8px;
+}
+
+/* Colour swatches */
+.swatch-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.18s;
+  flex-shrink: 0;
+}
+.swatch:hover { transform: scale(1.12); }
+.swatch.active { border-color: #fff; box-shadow: 0 0 0 1px rgba(255,255,255,0.3); }
+
+/* Generate btn (reuse fetch-btn style, different id) */
+.gen-graphic-btn {
+  width: 100%;
+  background: var(--gold);
+  color: var(--black);
+  border: none;
+  padding: 13px;
+  border-radius: 5px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.gen-graphic-btn:hover {
+  background: var(--gold-light);
+  box-shadow: 0 4px 24px rgba(201,168,76,0.3);
+  transform: translateY(-1px);
+}
+
+/* Right panel — canvas preview */
+.gpanel {
+  background: var(--s1);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.gpanel-header {
+  background: var(--s2);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.gpanel-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+.gpanel-dim {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+}
+
+.gpanel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Canvas wrapper */
+.canvas-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.canvas-wrap canvas {
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: block;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+}
+
+/* Download btn */
+.dl-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--gold-dim);
+  color: var(--gold-light);
+  padding: 11px;
+  border-radius: 5px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: none;
+  text-align: center;
+}
+.dl-btn.visible { display: block; }
+.dl-btn:hover { background: var(--gold-glow); box-shadow: 0 0 16px rgba(201,168,76,0.2); }
+
+/* Preview placeholder */
+.preview-placeholder {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text3);
+}
+.preview-placeholder .pe-icon { font-size: 44px; margin-bottom: 14px; opacity: 0.2; }
+.preview-placeholder .pe-txt { font-size: 12px; line-height: 1.7; }
+
+/* ── STORYBOARD SLIDE CARDS ──────────────────────── */
+.sb-slide-card {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.sb-slide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--s3);
+  border-bottom: 1px solid var(--border);
+}
+
+.sb-slide-num-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sb-slide-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.num-gold  { background: rgba(201,168,76,0.18);  color: var(--gold);  border: 1px solid rgba(201,168,76,0.35); }
+.num-blue  { background: rgba(91,141,239,0.18);  color: #93C5FD;      border: 1px solid rgba(91,141,239,0.35); }
+.num-green { background: rgba(46,204,113,0.18);  color: #4ADE80;      border: 1px solid rgba(46,204,113,0.35); }
+
+.sb-slide-label {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.sb-slide-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+  text-transform: uppercase;
+}
+
+.sb-copy-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sb-copy-btn:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold-light);
+  background: var(--gold-glow);
+}
+
+.sb-slide-body {
+  padding: 14px 14px 10px;
+}
+
+.sb-field {
+  margin-bottom: 10px;
+}
+
+.sb-field:last-child { margin-bottom: 0; }
+
+.sb-field-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 4px;
+}
+
+.sb-field-value {
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--s1);
+  line-height: 1.45;
+  cursor: text;
+  user-select: all;
+}
+
+/* value style variants */
+.sb-large {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.sb-accent {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+.sb-metric {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--gold);
+  text-align: center;
+  padding: 12px;
+  background: rgba(201,168,76,0.06);
+  border-color: rgba(201,168,76,0.2);
+  text-shadow: 0 0 20px rgba(201,168,76,0.3);
+}
+
+.sb-muted {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.sb-chip {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--gold-dim);
+  background: var(--gold-glow);
+  border-color: rgba(201,168,76,0.18);
+  text-transform: uppercase;
+}
+
+.sb-banner {
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--black);
+  background: var(--gold);
+  border-color: var(--gold);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.reel-nav-btn {
+  background: var(--s3);
+  border: 1px solid var(--border);
+  color: var(--text3);
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.reel-nav-btn:hover { border-color: var(--gold-dim); color: var(--text2); }
+.reel-nav-btn.active { background: var(--gold-glow); border-color: var(--gold-dim); color: var(--gold-light); }
+
+/* Page indicator dots in preview */
+.page-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+.page-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border2);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.page-dot.active { background: var(--gold); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--s3);
+  border: 1px solid var(--green);
+  color: var(--green);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 10px 22px;
+  border-radius: 5px;
+  z-index: 9999;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<noscript><div style="color:#C9A84C;text-align:center;padding:40px;font-size:18px;">Enable JavaScript to use GSEVN Pro Engine</div></noscript>
+
+<header>
+  <div class="logo">
+    <div class="logo-name">GSEVN Capital</div>
+    <div class="logo-sub">Pro Content Engine</div>
+  </div>
+  <div class="header-right">
+    <div class="date-tag" id="dateBadge">—</div>
+    <div class="pro-badge">PRO v2</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchMainTab(this,'feed')">📰 News Feed</div>
+  <div class="tab" onclick="switchMainTab(this,'series')">📅 Series Planner</div>
+  <div class="tab" onclick="switchMainTab(this,'graphic')">🖼 Instagram Graphics</div>
+</div>
+
+<div class="workspace">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sid-section">
+      <div class="sid-label">API Key</div>
+      <input class="sel" type="password" id="apiKeyInput" placeholder="sk-ant-... (Anthropic)" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0;" />
+      <input class="sel" id="newsDataKeyInput" placeholder="NewsData.io key — optional, for real news" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0;" />
+      <div style="font-size:9px;color:var(--text3);margin-top:4px;line-height:1.5;">Keys stored in your browser only.<br>NewsData = free real news (newsdata.io).<br>Without it, falls back to Google RSS → AI.</div>
+    </div>
+
+    <div class="sid-section">
+      <div class="sid-label">Topics</div>
+      <div class="chip on" data-t="pe" onclick="toggleChip(this)"><span>Private Equity</span><div class="chip-dot"></div></div>
+      <div class="chip on" data-t="vc" onclick="toggleChip(this)"><span>Venture Capital</span><div class="chip-dot"></div></div>
+      <div class="chip on" data-t="ma" onclick="toggleChip(this)"><span>M&A / Deals</span><div class="chip-dot"></div></div>
+      <div class="chip on" data-t="ib" onclick="toggleChip(this)"><span>IB / Wall St Careers</span><div class="chip-dot"></div></div>
+      <div class="chip" data-t="macro" onclick="toggleChip(this)"><span>Macro / Markets</span><div class="chip-dot"></div></div>
+    </div>
+
+    <div class="sid-section">
+      <div class="sid-label">Format</div>
+      <select class="sel" id="fmtSel">
+        <option value="hook">Hook + 3 Bullets + CTA</option>
+        <option value="anchor">News Anchor Script</option>
+        <option value="overlay">Text Overlay Only</option>
+        <option value="breakdown">Deal Breakdown</option>
+      </select>
+
+      <div class="sid-label">Duration</div>
+      <select class="sel" id="durSel">
+        <option value="10">~10 seconds</option>
+        <option value="15">~15 seconds</option>
+        <option value="30">~30 seconds</option>
+      </select>
+
+      <div class="sid-label">Tone</div>
+      <select class="sel" id="toneSel">
+        <option value="bold">Bold & Punchy</option>
+        <option value="professional">Professional</option>
+        <option value="educational">Educational</option>
+        <option value="viral">Viral / Hype</option>
+      </select>
+    </div>
+
+    <button class="fetch-btn" id="fetchBtn" onclick="fetchNews()">
+      <div class="spin" id="fetchSpin"></div>
+      <span id="fetchTxt">⚡ Fetch Today's News</span>
+    </button>
+  </aside>
+
+  <!-- MAIN FEED -->
+  <main class="feed" id="mainFeed">
+    <div class="feed-header">
+      <div class="feed-title">Today's <em>Deal Flow</em></div>
+    </div>
+    <div id="errBox" class="err-box" style="display:none"></div>
+    <div id="feedContent">
+      <div class="empty-state">
+        <div class="empty-icon">📡</div>
+        <div class="empty-title">No stories loaded</div>
+        <div class="empty-desc">Hit "Fetch Today's News" to pull the latest PE, VC, M&A and IB headlines — pre-scored for viral potential.</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside class="panel">
+    <div class="panel-tabs">
+      <div class="ptab active" onclick="switchPTab(this,'script')">Script</div>
+      <div class="ptab" onclick="switchPTab(this,'board')">Storyboard</div>
+      <div class="ptab" onclick="switchPTab(this,'viral')">Viral Score</div>
+      <div class="ptab" onclick="switchPTab(this,'caption')">Caption</div>
+    </div>
+    <div id="panelBody">
+      <div class="panel-empty">
+        <div class="pe-icon">🎬</div>
+        <div class="pe-txt">Select a story from the feed to generate your full video package — script, storyboard, viral analysis, and caption.</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────
+const state = {
+  topics: new Set(['pe','vc','ma','ib']),
+  news: [],
+  selected: null,
+  generated: null,
+  activeMainTab: 'feed',
+  activePTab: 'script',
+};
+
+// ── INIT ──────────────────────────────────────────────────
+const now = new Date();
+document.getElementById('dateBadge').textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+// Restore saved API key
+function safeLSGet(key) { try { return localStorage.getItem(key); } catch(e) { return null; } }
+function safeLSSet(key, val) { try { localStorage.setItem(key, val); } catch(e) {} }
+
+var _savedApiKey = safeLSGet('gsevn_api_key');
+if (_savedApiKey) document.getElementById('apiKeyInput').value = _savedApiKey;
+document.getElementById('apiKeyInput').addEventListener('change', function() {
+  safeLSSet('gsevn_api_key', this.value.trim());
+});
+var _savedNewsKey = safeLSGet('gsevn_newsdata_key');
+if (_savedNewsKey) document.getElementById('newsDataKeyInput').value = _savedNewsKey;
+document.getElementById('newsDataKeyInput').addEventListener('change', function() {
+  safeLSSet('gsevn_newsdata_key', this.value.trim());
+});
+
+function getApiKey() {
+  var k = document.getElementById('apiKeyInput').value.trim();
+  if (k) safeLSSet('gsevn_api_key', k);
+  return k;
+}
+function getNewsDataKey() {
+  var k = document.getElementById('newsDataKeyInput').value.trim();
+  if (k) safeLSSet('gsevn_newsdata_key', k);
+  return k;
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function switchMainTab(el, id) {
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  state.activeMainTab = id;
+  if (id === 'series') renderSeriesPlanner();
+  else renderFeed();
+}
+
+function switchPTab(el, id) {
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  state.activePTab = id;
+  if (state.generated) renderPanel();
+}
+
+// ── TOPIC CHIPS ───────────────────────────────────────────
+function toggleChip(el) {
+  const t = el.dataset.t;
+  if (state.topics.has(t)) { state.topics.delete(t); el.classList.remove('on'); }
+  else { state.topics.add(t); el.classList.add('on'); }
+}
+
+// Fix toggle
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.onclick = function() {
+    const t = this.dataset.t;
+    if (state.topics.has(t)) { state.topics.delete(t); this.classList.remove('on'); }
+    else { state.topics.add(t); this.classList.add('on'); }
+  };
+});
+
+// ── FETCH NEWS ───────────────────────────────────────────
+function setFetchLoading(on) {
+  document.getElementById('fetchBtn').disabled = on;
+  document.getElementById('fetchSpin').classList.toggle('on', on);
+  if (!on) document.getElementById('fetchTxt').textContent = '⚡ Fetch Today\'s News';
+}
+
+function showErr(msg) {
+  const b = document.getElementById('errBox');
+  b.style.display = 'block';
+  b.textContent = msg;
+}
+
+function hideErr() { document.getElementById('errBox').style.display = 'none'; }
+
+function showSkels() {
+  document.getElementById('feedContent').innerHTML = [1,2,3].map(()=>`
+    <div class="skel-card">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <div class="sl s" style="height:16px;border-radius:8px;"></div>
+        <div class="sl" style="width:60px;height:16px;border-radius:8px;"></div>
+      </div>
+      <div class="sl h l"></div>
+      <div class="sl f"></div>
+      <div class="sl m"></div>
+    </div>`).join('');
+}
+
+const TAGS = {
+  pe:    {l:'PE',    c:'ntag-pe'},
+  vc:    {l:'VC',    c:'ntag-vc'},
+  ma:    {l:'M&A',   c:'ntag-ma'},
+  ib:    {l:'IB',    c:'ntag-ib'},
+  macro: {l:'MACRO', c:'ntag-macro'},
+};
+
+const SERIES_MAP = {
+  pe:    [{name:'Deal Breakdown Monday', icon:'💼', desc:'Dissect a major PE deal'}, {name:'Fund Friday', icon:'📊', desc:'PE fund news & moves'}],
+  vc:    [{name:'Funding Flash', icon:'⚡', desc:'Hot VC rounds this week'}, {name:'Startup Watch', icon:'🚀', desc:'Companies to watch'}],
+  ma:    [{name:'Merger Monday', icon:'🤝', desc:'M&A moves & analysis'}, {name:'Deal Alert', icon:'🔔', desc:'Breaking deal news'}],
+  ib:    [{name:'Wall St Wednesday', icon:'🏦', desc:'IB career & culture'}, {name:'Analyst Take', icon:'📈', desc:'Street-level insight'}],
+  macro: [{name:'Market Minute', icon:'⏱️', desc:'Quick macro read'}, {name:'Rate Watch', icon:'📉', desc:'Fed & rates update'}],
+};
+
+// ── NEWS PIPELINE: NewsData.io → Google RSS → Claude knowledge ──
+
+function parseJSON(text) {
+  var clean = text.replace(/```json/g, '').replace(/```/g, '').trim();
+  var start = clean.indexOf('[');
+  var end = clean.lastIndexOf(']');
+  if (start === -1 || end <= start) return null;
+  try {
+    var arr = JSON.parse(clean.slice(start, end + 1));
+    if (Array.isArray(arr) && arr.length > 0) return arr;
+  } catch(e) {}
+  return null;
+}
+
+async function callClaude(apiKey, prompt) {
+  var res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  var data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  var text = '';
+  for (var i = 0; i < data.content.length; i++) {
+    if (data.content[i].type === 'text') text += data.content[i].text;
+  }
+  return text;
+}
+
+// ── Source 1: NewsData.io (FREE, 200 req/day, 100% real news) ──
+var ND_QUERIES = {
+  pe: 'private equity OR buyout OR KKR OR Blackstone OR Apollo OR Carlyle',
+  vc: 'venture capital OR startup funding OR Series A OR unicorn',
+  ma: 'merger OR acquisition OR takeover OR deal',
+  ib: 'investment banking OR IPO OR Goldman Sachs OR Morgan Stanley',
+  macro: 'federal reserve OR interest rates OR inflation OR markets'
+};
+
+async function fetchFromNewsData(topics) {
+  var ndKey = getNewsDataKey();
+  if (!ndKey) return [];
+  var query = topics.slice(0, 3).map(function(t) { return ND_QUERIES[t] || t; }).join(' OR ');
+  var url = 'https://newsdata.io/api/1/latest?apikey=' + ndKey + '&q=' + encodeURIComponent(query) + '&language=en&category=business&size=10';
+  var res = await fetch(url);
+  if (!res.ok) return [];
+  var data = await res.json();
+  if (data.status !== 'success' || !data.results) return [];
+  return data.results.map(function(item) {
+    var pub = item.pubDate ? new Date(item.pubDate) : new Date();
+    var h = Math.max(1, Math.round((Date.now() - pub.getTime()) / 3600000));
+    return {
+      title: (item.title || '').replace(/\s*-\s*[^-]*$/, '').trim(),
+      source: item.source_name || item.source_id || 'News',
+      link: item.link || '',
+      description: item.description || '',
+      time: h < 24 ? h + 'h ago' : Math.floor(h / 24) + 'd ago',
+      dateStr: pub.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    };
+  }).filter(function(item) { return item.title.length > 10; });
+}
+
+// ── Source 2: Google News RSS (FREE, no key) ──
+var RSS_QUERIES = {
+  pe: 'private equity buyout fund KKR Blackstone',
+  vc: 'venture capital startup funding round unicorn',
+  ma: 'merger acquisition M&A takeover deal',
+  ib: 'investment banking IPO Goldman Sachs Wall Street',
+  macro: 'markets Fed interest rates inflation oil'
+};
+
+async function fetchFromGoogleRSS(topics) {
+  var items = [];
+  for (var i = 0; i < Math.min(topics.length, 2); i++) {
+    var q = RSS_QUERIES[topics[i]] || topics[i];
+    var feedUrl = 'https://news.google.com/rss/search?hl=en-US&gl=US&ceid=US:en&q=' + encodeURIComponent(q + ' when:3d');
+    var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(feedUrl);
+    try {
+      var res = await fetch(proxyUrl);
+      if (!res.ok) continue;
+      var xml = await res.text();
+      if (xml.indexOf('<item>') === -1) continue;
+      var doc = new DOMParser().parseFromString(xml, 'text/xml');
+      doc.querySelectorAll('item').forEach(function(node) {
+        var title = (node.querySelector('title') || {}).textContent || '';
+        var pubDate = (node.querySelector('pubDate') || {}).textContent || '';
+        var source = (node.querySelector('source') || {}).textContent || '';
+        var link = (node.querySelector('link') || {}).textContent || '';
+        if (title.length < 5) return;
+        var pub = pubDate ? new Date(pubDate) : new Date();
+        var h = Math.max(1, Math.round((Date.now() - pub.getTime()) / 3600000));
+        items.push({
+          title: title.replace(/\s*-\s*[^-]+$/, '').trim(),
+          source: source || 'Google News',
+          link: link,
+          description: '',
+          time: h < 24 ? h + 'h ago' : Math.floor(h / 24) + 'd ago',
+          dateStr: pub.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        });
+      });
+    } catch(e) { continue; }
+  }
+  // Deduplicate
+  var seen = {};
+  return items.filter(function(item) {
+    var k = item.title.slice(0, 40).toLowerCase();
+    if (seen[k]) return false;
+    seen[k] = true;
+    return true;
+  });
+}
+
+// ── Claude scoring: real articles → formatted JSON, 1 per topic ──
+async function scoreArticles(articles, topicNames, seriesOpt, apiKey) {
+  var articleText = articles.slice(0, 15).map(function(item, i) {
+    return (i + 1) + '. [' + item.source + ' · ' + item.time + ' · ' + item.dateStr + ']\n   ' + item.title + (item.description ? '\n   ' + item.description.slice(0, 120) : '');
+  }).join('\n\n');
+
+  var prompt = 'From these REAL news headlines, pick exactly 5 stories — one for EACH of these categories: Private Equity, Venture Capital, M&A/Deals, Investment Banking, Macro/Markets.\n\nHeadlines:\n' + articleText + '\n\nReturn ONLY a JSON array. No markdown. Start with [ end with ].\nEach: {"headline":"rewritten punchy max 12 words","summary":"2 sentences with real context","source":"keep original source","publishedDate":"keep date","time":"keep time","category":"pe|vc|ma|ib|macro","viralScore":7-10,"viralReason":"why it engages","suggestedSeries":"from: ' + seriesOpt + '"}\nIMPORTANT: Return exactly 5 objects, one per category. Order: pe, vc, ma, ib, macro.';
+
+  var text = await callClaude(apiKey, prompt);
+  return parseJSON(text);
+}
+
+// ── MAIN FETCH FUNCTION ──
+async function fetchNews() {
+  var apiKey = getApiKey();
+  if (!apiKey) { showErr('Enter your Anthropic API key.'); return; }
+  hideErr();
+  setFetchLoading(true);
+  showSkels();
+  state.selected = null;
+  state.generated = null;
+  document.getElementById('panelBody').innerHTML = '<div class="panel-empty"><div class="pe-icon">🎬</div><div class="pe-txt">Select a story to generate your video package.</div></div>';
+
+  // Always all 5 topics — 1 news each
+  var selected = ['pe','vc','ma','ib','macro'];
+  var topicNames = ['Private Equity','Venture Capital','M&A / Deals','Investment Banking','Macro / Markets'];
+  var seriesOpt = [];
+  for (var s = 0; s < selected.length; s++) {
+    var sarr = SERIES_MAP[selected[s]] || [];
+    for (var j = 0; j < sarr.length; j++) seriesOpt.push(sarr[j].name);
+  }
+
+  var parsed = null;
+  var sourceUsed = '';
+
+  try {
+    // ── ATTEMPT 1: NewsData.io (real news) ──
+    var ndKey = getNewsDataKey();
+    if (ndKey) {
+      try {
+        document.getElementById('fetchTxt').textContent = '① Fetching real news...';
+        var ndArticles = await fetchFromNewsData(selected);
+        if (ndArticles.length >= 3) {
+          document.getElementById('fetchTxt').textContent = '① Scoring stories...';
+          parsed = await scoreArticles(ndArticles, topicNames, seriesOpt.join(', '), apiKey);
+          if (parsed && parsed.length > 0) sourceUsed = 'NewsData.io ✓ Real';
+        }
+      } catch(e1) { parsed = null; }
+    }
+
+    // ── ATTEMPT 2: Google News RSS (real news) ──
+    if (!parsed || parsed.length === 0) {
+      try {
+        document.getElementById('fetchTxt').textContent = '② Google News RSS...';
+        var rssArticles = await fetchFromGoogleRSS(selected);
+        if (rssArticles.length >= 3) {
+          document.getElementById('fetchTxt').textContent = '② Scoring stories...';
+          parsed = await scoreArticles(rssArticles, topicNames, seriesOpt.join(', '), apiKey);
+          if (parsed && parsed.length > 0) sourceUsed = 'Google News ✓ Real';
+        }
+      } catch(e2) { parsed = null; }
+    }
+
+    // ── ATTEMPT 3: Claude knowledge (fallback) ──
+    if (!parsed || parsed.length === 0) {
+      document.getElementById('fetchTxt').textContent = '③ AI knowledge...';
+      var today = new Date();
+      var dateStr = today.toLocaleDateString('en-US', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+      var pubDate = today.toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'});
+      var prompt = 'Today is ' + dateStr + '. Generate exactly 5 finance news stories — one for EACH category: Private Equity, Venture Capital, M&A/Deals, Investment Banking, Macro/Markets. Use real firm names, realistic numbers. Series: ' + seriesOpt.join(', ') + '.\n\nReturn ONLY a JSON array. No markdown. Start with [ end with ]. Order: pe, vc, ma, ib, macro.\n[{"headline":"max 12 words","summary":"2 sentences","source":"Bloomberg|WSJ|FT|Reuters","publishedDate":"' + pubDate + '","time":"2h ago","category":"pe|vc|ma|ib|macro","viralScore":8,"viralReason":"why","suggestedSeries":"from list"}]';
+      var text = await callClaude(apiKey, prompt);
+      parsed = parseJSON(text);
+      if (parsed && parsed.length > 0) sourceUsed = 'AI Knowledge ⚠️';
+    }
+
+    if (!parsed || parsed.length === 0) throw new Error('All sources failed. Try again.');
+
+    state.news = parsed;
+    renderFeed();
+    showToast('✓ ' + sourceUsed);
+
+  } catch(err) {
+    showErr('Failed: ' + err.message);
+    document.getElementById('feedContent').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Failed</div><div class="empty-desc">' + err.message + '</div></div>';
+  }
+  setFetchLoading(false);
+}
+
+
+function renderFeed() {
+  if (!state.news.length) return;
+  document.getElementById('feedContent').innerHTML = state.news.map((item,i)=>{
+    const tag = TAGS[item.category]||TAGS.macro;
+    const vs = item.viralScore||5;
+    const vclass = vs>=8?'high':vs>=5?'med':'low';
+    const vemoji = vs>=8?'🔥':vs>=5?'📈':'📊';
+    const sourceLink = item.sourceUrl
+      ? `<a class="nsource-link" href="${item.sourceUrl}" target="_blank" onclick="event.stopPropagation()">${item.source}</a><span class="nsource"> · ${item.time}</span>`
+      : `<span class="nsource">${item.source} · ${item.time}</span>`;
+    const dateBadge = item.publishedDate
+      ? `<span class="ndate-badge">📅 ${item.publishedDate}</span>`
+      : '';
+
+    return `
+    <div class="ncard${state.selected===i?' sel':''}" id="nc${i}" onclick="selectCard(${i})">
+      <div class="ncard-top">
+        <div class="ncard-left">
+          <span class="ntag ${tag.c}">${tag.l}</span>
+          ${sourceLink}
+        </div>
+        <div class="vscore ${vclass}"><div class="vscore-dot"></div>${vemoji} ${vs}/10</div>
+      </div>
+      <div class="ncard-title">${item.headline}</div>
+      <div class="ncard-desc">${item.summary}</div>
+      <div class="ncard-footer">
+        ${dateBadge}
+        ${item.suggestedSeries?`<span class="series-tag">📌 ${item.suggestedSeries}</span>`:''}
+        <span class="viral-reason">${item.viralReason||''}</span>
+      </div>
+      <button class="abtn primary" style="margin-top:10px;width:100%;padding:9px;font-size:11px;" onclick="event.stopPropagation(); oneClickGenerate(${i})">⚡ Generate Reel & Download ZIP</button>
+    </div>`;
+  }).join('');
+}
+
+// ── SELECT CARD ───────────────────────────────────────────
+function selectCard(i) {
+  state.selected = i;
+  document.querySelectorAll('.ncard').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('nc'+i)?.classList.add('sel');
+  generatePackage(state.news[i]);
+}
+
+// ── GENERATE FULL PACKAGE ─────────────────────────────────
+async function generatePackage(item) {
+  state.generated = null;
+
+  // Show loading in panel
+  document.getElementById('panelBody').innerHTML = `
+    <div class="panel-loading">
+      ${[1,2,3].map(()=>`
+        <div class="panel-skel">
+          <div class="sl s" style="margin-bottom:12px;"></div>
+          <div class="sl h l"></div>
+          <div class="sl m"></div>
+          <div class="sl f" style="margin-top:8px;"></div>
+        </div>`).join('')}
+    </div>`;
+
+  const fmt = document.getElementById('fmtSel').value;
+  const dur = document.getElementById('durSel').value;
+  const tone = document.getElementById('toneSel').value;
+
+  const prompt = `You are the head content strategist for GSEVN Capital, a top finance Instagram page targeting 20-35 year old finance professionals and aspirants.
+
+Story: "${item.headline}"
+Details: ${item.summary}
+Category: ${item.category.toUpperCase()}
+Series: ${item.suggestedSeries||''}
+Duration: ~${dur} seconds
+Tone: ${tone}
+
+Generate a COMPLETE video package. Respond ONLY as JSON, no markdown:
+{
+  "hook": {
+    "text": "The main hook sentence — punchy, scroll-stopping, under 15 words",
+    "score": 8,
+    "scoreVerdict": "One sentence on why this hook works or doesn't",
+    "alternatives": [
+      {"style": "Curiosity", "text": "..."},
+      {"style": "Controversy", "text": "..."},
+      {"style": "Shock", "text": "..."}
+    ]
+  },
+  "bullets": ["Bullet 1 under 8 words", "Bullet 2", "Bullet 3"],
+  "cta": "Follow for daily deal breakdowns. 🔔",
+  "reelSlides": {
+    "hook": {
+      "line1": "Hook line 1 — large white text, punchy, max 5 words",
+      "line2": "Hook line 2 — accent colour, max 5 words, completes line1",
+      "subline": "Supporting context sentence, under 12 words"
+    },
+    "page1": {
+      "label": "Section label in small caps, 2-3 words e.g. THE DEAL",
+      "metric": "The bold standout number or stat e.g. $4.2B or 26% IRR",
+      "text": "One supporting sentence explaining the metric, under 15 words"
+    },
+    "page2": {
+      "label": "Section label e.g. THE RETURN",
+      "metric": "Bold metric e.g. 3.2× MOIC",
+      "text": "One supporting sentence, under 15 words"
+    },
+    "page3": {
+      "label": "Section label e.g. THE LESSON",
+      "metric": "Bold insight or stat e.g. $14B Exit",
+      "text": "One supporting sentence, under 15 words"
+    },
+    "cta": {
+      "line1": "CTA main line, compelling follow prompt, under 10 words",
+      "line2": "@gsevncapital · #PrivateEquity"
+    }
+  },
+  "viralFactors": [
+    "Factor 1 explaining viral potential",
+    "Factor 2",
+    "Factor 3"
+  ],
+  "caption": "Full Instagram caption with emojis, conversational, under 120 words. NO hashtags here.",
+  "hashtags": ["PrivateEquity","VentureCapital","Finance","WallStreet","Investing","MBA","IB","PE","VC","MergersAndAcquisitions","FinanceCareers","GoldmanSachs","Blackstone","Dealmaking","MoneyTalks"]
+}`;
+
+  try {
+    var apiKey = getApiKey();
+    if (!apiKey) throw new Error('Enter your API key in the sidebar.');
+    var raw = await callClaude(apiKey, prompt);
+    raw = raw.replace(/```json|```/g,'').trim();
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')+1;
+    state.generated = JSON.parse(raw.slice(s,e));
+    state.generated._item = item;
+    renderPanel();
+  } catch(err) {
+    document.getElementById('panelBody').innerHTML = `<div class="panel-body"><div class="err-box">Failed: ${err.message}</div></div>`;
+  }
+}
+
+// ── AUTO-FILL REEL TEMPLATE ───────────────────────────────
+function autoFillReel() {
+  var g  = state.generated;
+  if (!g) { return; }
+  var rs = g.reelSlides || {};
+  var item = g._item || {};
+
+  // ── Fill all reel input fields ────────────────────────
+  function fill(id, val) {
+    var el = document.getElementById(id);
+    if (el && val) { el.value = val; }
+  }
+
+  // Hook slide
+  fill('r_h1',    rs.hook  && rs.hook.line1);
+  fill('r_h2',    rs.hook  && rs.hook.line2);
+  fill('r_hsub',  rs.hook  && rs.hook.subline);
+  fill('r_brand', item.suggestedSeries || 'G7 Capital · PE Insights');
+
+  // Overlay page 1
+  fill('r_p1label',  rs.page1 && rs.page1.label);
+  fill('r_p1metric', rs.page1 && rs.page1.metric);
+  fill('r_p1text',   rs.page1 && rs.page1.text);
+
+  // Overlay page 2
+  fill('r_p2label',  rs.page2 && rs.page2.label);
+  fill('r_p2metric', rs.page2 && rs.page2.metric);
+  fill('r_p2text',   rs.page2 && rs.page2.text);
+
+  // Overlay page 3
+  fill('r_p3label',  rs.page3 && rs.page3.label);
+  fill('r_p3metric', rs.page3 && rs.page3.metric);
+  fill('r_p3text',   rs.page3 && rs.page3.text);
+
+  // CTA slide
+  fill('r_cta1', rs.cta && rs.cta.line1);
+  fill('r_cta2', rs.cta && rs.cta.line2);
+
+  // ── Set accent color based on topic ───────────────
+  if (item.category) setAccentForTopic(item.category);
+
+  // ── Switch to Reel template + Graphics tab ────────────
+  // Make sure reel template is active in graphic generator
+  gSwitchTemplate('reel');
+
+  // Switch main tab to 'graphic'
+  var graphicTab = document.querySelector('.tabs .tab[onclick*="graphic"]');
+  if (graphicTab) {
+    graphicTab.click();
+  } else {
+    // fallback — call directly
+    var gw = document.getElementById('graphicWorkspace');
+    var ws = document.querySelector('.workspace');
+    document.querySelectorAll('.tabs .tab').forEach(function(t) { t.classList.remove('active'); });
+    if (ws)  { ws.classList.add('hidden'); }
+    if (gw)  { gw.classList.add('visible'); }
+  }
+
+  // ── Auto-generate the canvas preview ─────────────────
+  // Small delay so the tab switch paints first
+  setTimeout(function() {
+    var genBtn = document.getElementById('gGenBtn');
+    if (genBtn) { genBtn.click(); }
+  }, 120);
+
+  // ── Flash confirmation toast ──────────────────────────
+  showToast('⚡ Reel template filled — review & download!');
+}
+
+// ── TOPIC → ACCENT COLOR MAP ──────────────────────────────
+var TOPIC_COLORS = {
+  pe:    '#5B8DEF',  // Blue
+  vc:    '#C9A84C',  // Yellow/Gold
+  ma:    '#2ECC71',  // Green
+  ib:    '#E74C3C',  // Red
+  macro: '#BDC3C7'   // Grey
+};
+
+function setAccentForTopic(category) {
+  var color = TOPIC_COLORS[category] || '#C9A84C';
+  gAccent = color;
+  // Update swatch UI
+  var swatches = document.querySelectorAll('#swatchRow .swatch');
+  for (var i = 0; i < swatches.length; i++) {
+    swatches[i].classList.remove('active');
+    if (swatches[i].getAttribute('data-color') === color) swatches[i].classList.add('active');
+  }
+}
+
+// ── ONE-CLICK: Select card → Generate content → Fill template → Download ZIP ──
+async function oneClickGenerate(cardIndex) {
+  var item = state.news[cardIndex];
+  if (!item) return;
+
+  // 1. Select the card
+  state.selected = cardIndex;
+  document.querySelectorAll('.ncard').forEach(function(c) { c.classList.remove('sel'); });
+  var cardEl = document.getElementById('nc' + cardIndex);
+  if (cardEl) cardEl.classList.add('sel');
+
+  // 2. Set accent color based on topic
+  setAccentForTopic(item.category);
+
+  // 3. Generate content package
+  document.getElementById('panelBody').innerHTML = '<div class="panel-loading" style="padding:20px;text-align:center;"><div style="font-size:13px;color:var(--gold);">Generating content for: ' + item.headline + '</div><div class="sl h l" style="margin-top:16px;"></div><div class="sl f" style="margin-top:8px;"></div></div>';
+
+  var apiKey = getApiKey();
+  if (!apiKey) { showErr('Enter your API key.'); return; }
+
+  var dur = document.getElementById('durSel').value;
+  var tone = document.getElementById('toneSel').value;
+
+  var prompt = 'You are the head content strategist for GSEVN Capital (@gsevncapital), a finance Instagram page.\n\nStory: "' + item.headline + '"\nDetails: ' + item.summary + '\nCategory: ' + (item.category || '').toUpperCase() + '\nSeries: ' + (item.suggestedSeries || '') + '\nDuration: ~' + dur + ' seconds\nTone: ' + tone + '\n\nGenerate a COMPLETE video package. Respond ONLY as JSON, no markdown:\n{"hook":{"text":"scroll-stopping under 15 words","score":8,"scoreVerdict":"why this works","alternatives":[{"style":"Curiosity","text":"..."},{"style":"Controversy","text":"..."},{"style":"Shock","text":"..."}]},"bullets":["point 1","point 2","point 3"],"cta":"Follow for daily deal breakdowns. 🔔","reelSlides":{"hook":{"line1":"white headline max 5 words","line2":"accent line max 5 words","subline":"supporting text"},"page1":{"label":"LABEL","metric":"$X.XB","text":"context"},"page2":{"label":"LABEL","metric":"X.Xx","text":"context"},"page3":{"label":"LABEL","metric":"stat","text":"context"},"cta":{"line1":"follow prompt","line2":"@gsevncapital · #tag"}},"viralFactors":["factor 1","factor 2","factor 3"],"caption":"Instagram caption under 120 words, no hashtags","hashtags":["PrivateEquity","Finance","WallStreet","Investing","VentureCapital"]}';
+
+  try {
+    var raw = await callClaude(apiKey, prompt);
+    raw = raw.replace(/```json|```/g, '').trim();
+    var s = raw.indexOf('{'), e = raw.lastIndexOf('}') + 1;
+    state.generated = JSON.parse(raw.slice(s, e));
+    state.generated._item = item;
+
+    // 4. Auto-fill reel template
+    var rs = state.generated.reelSlides || {};
+    function fill(id, val) { var el = document.getElementById(id); if (el && val) el.value = val; }
+    fill('r_h1', rs.hook && rs.hook.line1);
+    fill('r_h2', rs.hook && rs.hook.line2);
+    fill('r_hsub', rs.hook && rs.hook.subline);
+    fill('r_brand', item.suggestedSeries || 'GSEVN Capital');
+    fill('r_p1label', rs.page1 && rs.page1.label);
+    fill('r_p1metric', rs.page1 && rs.page1.metric);
+    fill('r_p1text', rs.page1 && rs.page1.text);
+    fill('r_p2label', rs.page2 && rs.page2.label);
+    fill('r_p2metric', rs.page2 && rs.page2.metric);
+    fill('r_p2text', rs.page2 && rs.page2.text);
+    fill('r_p3label', rs.page3 && rs.page3.label);
+    fill('r_p3metric', rs.page3 && rs.page3.metric);
+    fill('r_p3text', rs.page3 && rs.page3.text);
+    fill('r_cta1', rs.cta && rs.cta.line1);
+    fill('r_cta2', rs.cta && rs.cta.line2);
+
+    // 5. Switch to Graphics tab + Reel template
+    gSwitchTemplate('reel');
+    var graphicTab = document.querySelector('.tabs .tab[onclick*="graphic"]');
+    if (graphicTab) {
+      graphicTab.click();
+    } else {
+      var gw = document.getElementById('graphicWorkspace');
+      var ws = document.querySelector('.workspace');
+      document.querySelectorAll('.tabs .tab').forEach(function(t) { t.classList.remove('active'); });
+      if (ws) ws.classList.add('hidden');
+      if (gw) gw.classList.add('visible');
+    }
+
+    // 6. Generate slides + auto-download ZIP
+    setTimeout(function() {
+      var genBtn = document.getElementById('gGenBtn');
+      if (genBtn) genBtn.click();
+
+      // 7. Auto-download ZIP after slides render
+      setTimeout(function() {
+        downloadCanvas();
+        showToast('✓ ' + (item.category || '').toUpperCase() + ' reel downloaded!');
+      }, 500);
+    }, 200);
+
+  } catch(err) {
+    showErr('Failed: ' + err.message);
+  }
+}
+
+function renderPanel() {
+  if (!state.generated) return;
+  const g = state.generated;
+  const tab = state.activePTab;
+
+  let html = '<div class="panel-body">';
+
+  if (tab === 'script') html += renderScriptTab(g);
+  else if (tab === 'board') html += renderBoardTab(g);
+  else if (tab === 'viral') html += renderViralTab(g);
+  else if (tab === 'caption') html += renderCaptionTab(g);
+
+  html += `
+    <div class="action-row">
+      <button class="abtn primary" id="copyAllBtn" onclick="copyAll()">📋 Copy All</button>
+      <button class="abtn regen-btn" onclick="generatePackage(state.generated._item)">↺ Regen</button>
+    </div>
+    <button class="autofill-btn" onclick="autoFillReel()">⚡ Auto-Fill Reel Template →</button>
+  </div>`;
+
+  document.getElementById('panelBody').innerHTML = html;
+}
+
+function renderScriptTab(g) {
+  const hs = g.hook.score||7;
+  const hclass = hs>=8?'good':hs>=5?'ok':'bad';
+  const pct = (hs/10*100).toFixed(0);
+
+  return `
+    <div class="hook-score-bar">
+      <div class="hsb-top">
+        <div class="hsb-label">Hook Strength</div>
+        <div class="hsb-score ${hclass}">${hs}/10</div>
+      </div>
+      <div class="progress-track"><div class="progress-fill ${hclass}" style="width:${pct}%"></div></div>
+      <div class="hsb-verdict">${g.hook.scoreVerdict||''}</div>
+    </div>
+
+    <div class="script-block">
+      <div class="sb-label">Current Hook</div>
+      <div class="hook-text">${g.hook.text}</div>
+    </div>
+
+    <div class="sb-label" style="margin-bottom:8px;">Alternative Hooks — click to use</div>
+    <div class="hook-alts">
+      ${(g.hook.alternatives||[]).map((a,i)=>`
+        <div class="alt-hook" onclick="useHook(${i})">
+          <div class="alt-hook-label">${a.style}</div>
+          <div class="alt-hook-text">${a.text}</div>
+          <button class="use-hook-btn">USE ↑</button>
+        </div>`).join('')}
+    </div>
+
+    <div class="script-block">
+      <div class="sb-label">Key Points</div>
+      <ul class="bullets">
+        ${(g.bullets||[]).map(b=>`<li>${b}</li>`).join('')}
+      </ul>
+    </div>
+
+    <div class="script-block">
+      <div class="sb-label">Call To Action</div>
+      <div class="cta-text">${g.cta||''}</div>
+    </div>`;
+}
+
+function renderBoardTab(g) {
+  const item = g._item;
+  const dur = document.getElementById('durSel').value;
+  const seriesInfo = item.suggestedSeries || 'GSEVN Capital';
+  const rs = g.reelSlides || {};
+
+  // helper — copy button with unique id
+  function copyBtn(id, txt) {
+    return `<button class="sb-copy-btn" id="${id}" onclick="sbCopy('${id}', this)">Copy</button>`;
+  }
+
+  // helper — one slide card
+  function slideCard(num, total, icon, titleLabel, colorClass, innerHtml, copyId, copyText) {
+    return `
+    <div class="sb-slide-card">
+      <div class="sb-slide-header">
+        <div class="sb-slide-num-wrap">
+          <div class="sb-slide-num ${colorClass}">${num}</div>
+          <div>
+            <div class="sb-slide-label">${titleLabel}</div>
+            <div class="sb-slide-sub">${icon} Slide ${num} of ${total}</div>
+          </div>
+        </div>
+        <button class="sb-copy-btn" id="sbc-${copyId}" onclick="sbCopy('sbc-${copyId}', this, \`${copyText.replace(/`/g,'\\`')}\`)">📋 Copy</button>
+      </div>
+      <div class="sb-slide-body">${innerHtml}</div>
+    </div>`;
+  }
+
+  // --- Build each slide's inner HTML + copy text ---
+
+  // SLIDE 1 — Hook
+  const hookLine1 = rs.hook?.line1 || g.hook?.text || '—';
+  const hookLine2 = rs.hook?.line2 || '';
+  const hookSub   = rs.hook?.subline || '';
+  const hookCopy  = `HOOK SLIDE\nLine 1 (white, large): ${hookLine1}\nLine 2 (accent colour): ${hookLine2}\nSub-line (small): ${hookSub}\nBrand tag: ${seriesInfo}`;
+  const hookInner = `
+    <div class="sb-field">
+      <div class="sb-field-label">Line 1 — White · Large</div>
+      <div class="sb-field-value sb-large">${hookLine1}</div>
+    </div>
+    <div class="sb-field">
+      <div class="sb-field-label">Line 2 — Accent Colour · Large</div>
+      <div class="sb-field-value sb-accent">${hookLine2}</div>
+    </div>
+    <div class="sb-field">
+      <div class="sb-field-label">Sub-line — Muted · Small</div>
+      <div class="sb-field-value sb-muted">${hookSub}</div>
+    </div>
+    <div class="sb-field">
+      <div class="sb-field-label">Brand Tag (top-left chip)</div>
+      <div class="sb-field-value sb-chip">${seriesInfo}</div>
+    </div>`;
+
+  // SLIDE 2,3,4 — Overlay pages
+  const pages = [
+    { key:'page1', num:2, label:'Overlay Page 1' },
+    { key:'page2', num:3, label:'Overlay Page 2' },
+    { key:'page3', num:4, label:'Overlay Page 3' },
+  ];
+  const pageSlides = pages.map(p => {
+    const pd = rs[p.key] || {};
+    const lbl = pd.label || '—';
+    const met = pd.metric || '—';
+    const txt = pd.text   || '—';
+    const cp = `${p.label.toUpperCase()}\nLabel (small caps): ${lbl}\nBold Metric (LARGE): ${met}\nContext line: ${txt}`;
+    const inner = `
+      <div class="sb-field">
+        <div class="sb-field-label">Label — Small Caps · Muted</div>
+        <div class="sb-field-value sb-chip">${lbl}</div>
+      </div>
+      <div class="sb-field">
+        <div class="sb-field-label">Bold Metric — Massive · Accent (centre)</div>
+        <div class="sb-field-value sb-metric">${met}</div>
+      </div>
+      <div class="sb-field">
+        <div class="sb-field-label">Context Line — Supporting Text</div>
+        <div class="sb-field-value sb-muted">${txt}</div>
+      </div>`;
+    return slideCard(p.num, 5, '📄', p.label, 'num-blue', inner, p.key, cp);
+  }).join('');
+
+  // SLIDE 5 — CTA
+  const ctaLine1 = rs.cta?.line1 || g.cta || 'Follow for daily deal breakdowns';
+  const ctaLine2 = rs.cta?.line2 || '@gsevncapital · #PrivateEquity';
+  const ctaCopy  = `CTA SLIDE\nMain line: ${ctaLine1}\nHandle / hashtag: ${ctaLine2}\nBottom banner: 🔔 FOLLOW @GSEVNCAPITAL`;
+  const ctaInner = `
+    <div class="sb-field">
+      <div class="sb-field-label">CTA Main Line — White · Large</div>
+      <div class="sb-field-value sb-large">${ctaLine1}</div>
+    </div>
+    <div class="sb-field">
+      <div class="sb-field-label">Handle / Hashtag — Accent</div>
+      <div class="sb-field-value sb-accent">${ctaLine2}</div>
+    </div>
+    <div class="sb-field">
+      <div class="sb-field-label">Bottom Banner (auto-filled)</div>
+      <div class="sb-field-value sb-banner">🔔  FOLLOW  @GSEVNCAPITAL</div>
+    </div>`;
+
+  // Copy-all text
+  const allCopy = [
+    '=== GSEVN CAPITAL — REEL STORYBOARD ===',
+    '',
+    hookCopy,
+    '',
+    `OVERLAY PAGE 1\nLabel: ${rs.page1?.label||'—'}\nMetric: ${rs.page1?.metric||'—'}\nText: ${rs.page1?.text||'—'}`,
+    '',
+    `OVERLAY PAGE 2\nLabel: ${rs.page2?.label||'—'}\nMetric: ${rs.page2?.metric||'—'}\nText: ${rs.page2?.text||'—'}`,
+    '',
+    `OVERLAY PAGE 3\nLabel: ${rs.page3?.label||'—'}\nMetric: ${rs.page3?.metric||'—'}\nText: ${rs.page3?.text||'—'}`,
+    '',
+    ctaCopy,
+  ].join('\n');
+
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--text);">Reel Storyboard <span style="color:var(--gold);">5 Slides</span></div>
+      <button class="abtn" style="flex:0;padding:8px 14px;font-size:10px;" id="copyBoardAll" onclick="sbCopyAll(\`${allCopy.replace(/`/g,'\\`')}\`)">📋 Copy All Slides</button>
+    </div>
+
+    <div style="font-size:11px;color:var(--text3);margin-bottom:16px;line-height:1.6;">Each card below = one slide in the Instagram Graphic Generator. Copy the text and paste it into the matching field.</div>
+
+    ${slideCard(1, 5, '🪝', 'Hook Slide', 'num-gold', hookInner, 'hook', hookCopy)}
+    ${pageSlides}
+    ${slideCard(5, 5, '📣', 'Call To Action', 'num-green', ctaInner, 'cta', ctaCopy)}
+
+    ${item.suggestedSeries ? `
+    <div class="series-display" style="margin-top:4px;">
+      <div class="series-icon">${getSeries(item.category).icon}</div>
+      <div class="series-info">
+        <div class="series-name">${item.suggestedSeries}</div>
+        <div class="series-desc">${getSeries(item.category).desc}</div>
+      </div>
+    </div>` : ''}`;
+}
+
+function sbCopy(id, btn, text) {
+  // if text not passed, fall back to reading from DOM
+  var t = text || document.getElementById(id)?.textContent || '';
+  navigator.clipboard.writeText(t).then(function() {
+    var orig = btn.textContent;
+    btn.textContent = '✅ Copied!';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'var(--green)';
+    setTimeout(function() {
+      btn.textContent = orig;
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 2000);
+  });
+}
+
+function sbCopyAll(text) {
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = document.getElementById('copyBoardAll');
+    if (btn) {
+      btn.textContent = '✅ All Copied!';
+      setTimeout(function() { btn.textContent = '📋 Copy All Slides'; }, 2000);
+    }
+  });
+}
+
+function renderViralTab(g) {
+  const item = g._item;
+  const vs = item.viralScore||7;
+  const vclass = vs>=8?'high':vs>=5?'med':'low';
+  const label = vs>=8?'High Viral Potential':vs>=5?'Moderate Potential':'Lower Potential';
+
+  return `
+    <div class="viral-detail">
+      <div class="viral-score-big">
+        <div class="vsb-num ${vclass}">${vs}</div>
+        <div class="vsb-info">
+          <div class="vsb-title">${label}</div>
+          <div class="vsb-sub">Out of 10 · Finance Instagram</div>
+        </div>
+      </div>
+      <div class="progress-track" style="margin-bottom:10px;"><div class="progress-fill ${vclass}" style="width:${vs*10}%"></div></div>
+      <div style="font-size:11px;color:var(--text2);font-style:italic;margin-bottom:12px;">"${item.viralReason||''}"</div>
+      <div class="sb-label" style="margin-bottom:8px;">Why This Story Works</div>
+      <ul class="viral-factors">
+        ${(g.viralFactors||[]).map(f=>`<li>${f}</li>`).join('')}
+      </ul>
+    </div>
+
+    <div class="script-block">
+      <div class="sb-label">Best Posting Time</div>
+      <div style="font-size:12px;color:var(--text);">
+        ${vs>=8?'Post within the next 2-4 hours while story is trending. Finance audience peaks 7–9am and 6–8pm EST.':'Post during peak hours: 7–9am or 12–1pm EST for maximum reach.'}
+      </div>
+    </div>
+
+    <div class="script-block">
+      <div class="sb-label">Content Tip</div>
+      <div style="font-size:12px;color:var(--text);line-height:1.7;">
+        ${vs>=8?'🔥 This is a high-potential story — record it today. Add your personal reaction/opinion to the hook for extra engagement.':'📈 Solid story. Lead with the dollar amount or firm name in your first 2 seconds. Numbers stop scrolls.'}
+      </div>
+    </div>`;
+}
+
+function renderCaptionTab(g) {
+  return `
+    <div class="caption-area">
+      <div class="sb-label" style="margin-bottom:8px;">Instagram / TikTok Caption</div>
+      <div class="caption-txt">${g.caption||''}</div>
+    </div>
+
+    <div style="margin-bottom:10px;">
+      <div class="sb-label" style="margin-bottom:8px;">Hashtags</div>
+      <div class="tags-row">
+        ${(g.hashtags||[]).map(h=>`<span class="htag">#${h.replace('#','')}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="abtn" id="copyCaptionBtn" onclick="copyCaption()">📋 Copy Caption</button>
+      <button class="abtn" id="copyTagsBtn" onclick="copyTags()">📋 Copy Hashtags</button>
+    </div>`;
+}
+
+function getSeries(cat) {
+  const opts = SERIES_MAP[cat]||SERIES_MAP.macro;
+  return opts[0];
+}
+
+// ── USE HOOK ──────────────────────────────────────────────
+function useHook(i) {
+  if (!state.generated) return;
+  const alt = state.generated.hook.alternatives[i];
+  state.generated.hook.text = alt.text;
+  state.generated.hook.score = null;
+  state.generated.hook.scoreVerdict = `Switched to ${alt.style} style hook.`;
+  renderPanel();
+}
+
+// ── COPY ACTIONS ──────────────────────────────────────────
+function copyAll() {
+  const g = state.generated;
+  if (!g) return;
+  const txt = [
+    '=== GSEVN CAPITAL — VIDEO PACKAGE ===',
+    '',
+    '🎬 HOOK:',
+    g.hook.text,
+    '',
+    '📌 KEY POINTS:',
+    (g.bullets||[]).map(b=>`• ${b}`).join('\n'),
+    '',
+    `💬 CTA: ${g.cta}`,
+    '',
+    '📺 OVERLAY LINES:',
+    (g.overlayLines||[]).map((l,i)=>`[${i+1}] ${l.text}`).join('\n'),
+    '',
+    '📝 CAPTION:',
+    g.caption,
+    '',
+    '#️⃣ HASHTAGS:',
+    (g.hashtags||[]).map(h=>`#${h.replace('#','')}`).join(' '),
+  ].join('\n');
+
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn = document.getElementById('copyAllBtn');
+    if(btn){btn.textContent='✅ Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='📋 Copy All';btn.classList.remove('copied');},2000);}
+  });
+}
+
+function copyCaption() {
+  const g = state.generated;
+  if (!g) return;
+  navigator.clipboard.writeText(g.caption).then(()=>{
+    const btn = document.getElementById('copyCaptionBtn');
+    if(btn){btn.textContent='✅ Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='📋 Copy Caption';btn.classList.remove('copied');},2000);}
+  });
+}
+
+function copyTags() {
+  const g = state.generated;
+  if (!g) return;
+  const txt = (g.hashtags||[]).map(h=>`#${h.replace('#','')}`).join(' ');
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn = document.getElementById('copyTagsBtn');
+    if(btn){btn.textContent='✅ Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='📋 Copy Hashtags';btn.classList.remove('copied');},2000);}
+  });
+}
+
+// ── SERIES PLANNER ────────────────────────────────────────
+function renderSeriesPlanner() {
+  var assignments = [
+    {day:'Monday',   series:'Deal Breakdown Monday', icon:'💼', cat:'PE', tip:'Pick the biggest PE deal of the week'},
+    {day:'Tuesday',  series:'Funding Flash',          icon:'⚡', cat:'VC', tip:'Latest VC rounds & hot startups'},
+    {day:'Wednesday',series:'Wall St Wednesday',       icon:'🏦', cat:'IB', tip:'Career tips, IB culture, analyst life'},
+    {day:'Thursday', series:'Merger Monday',           icon:'🤝', cat:'M&A', tip:'M&A deep dives and strategic rationale'},
+    {day:'Friday',   series:'Fund Friday',             icon:'📊', cat:'PE', tip:'Fund performance, LP news, allocations'},
+    {day:'Saturday', series:'Market Minute',           icon:'⏱️', cat:'MACRO', tip:'Weekly macro wrap for your audience'},
+    {day:'Sunday',   series:'Analyst Take',            icon:'📈', cat:'IB', tip:'Opinion/hot take piece — high engagement'},
+  ];
+
+  document.getElementById('feedContent').innerHTML =
+    '<div style="margin-bottom:24px;">' +
+    '<div class="feed-title" style="margin-bottom:6px;">Weekly <em>Series Planner</em></div>' +
+    '<div style="font-size:12px;color:var(--text3);margin-bottom:20px;">Your 7-day content calendar. Consistency = algorithm growth.</div>' +
+    assignments.map(function(a) {
+      return '<div class="ncard" style="display:flex;align-items:center;gap:16px;">' +
+        '<div style="font-size:28px;width:44px;text-align:center;flex-shrink:0;">' + a.icon + '</div>' +
+        '<div style="flex:1;">' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">' +
+        '<div style="font-family:\'Cormorant Garamond\',serif;font-size:16px;font-weight:700;">' + a.series + '</div>' +
+        '<span class="ntag ntag-' + a.cat.toLowerCase() + '">' + a.cat + '</span>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--text3);">' + a.day + ' · ' + a.tip + '</div>' +
+        '</div></div>';
+    }).join('') +
+    '</div>';
+}
+</script>
+
+<!-- ══════════════════════════════════════════════════════
+     GRAPHIC GENERATOR WORKSPACE
+     ══════════════════════════════════════════════════════ -->
+
+<div class="graphic-workspace" id="graphicWorkspace">
+
+  <!-- Left Sidebar: controls -->
+  <aside class="gsb">
+    <div class="sid-section">
+      <div class="sid-label">Template</div>
+      <div class="tpl-row">
+        <div class="tpl-btn active" id="tplPostBtn" onclick="gSwitchTemplate('post')">Post<br><span style="font-size:8px;opacity:0.6;">1080×1080</span></div>
+        <div class="tpl-btn" id="tplReelBtn" onclick="gSwitchTemplate('reel')">Reel Cover<br><span style="font-size:8px;opacity:0.6;">1080×1920</span></div>
+      </div>
+    </div>
+
+    <div class="sid-section">
+      <div class="sid-label">Accent Colour</div>
+      <div class="swatch-row" id="swatchRow">
+        <div class="swatch active" data-color="#C9A84C" style="background:#C9A84C;" onclick="gPickColor(this)" title="Gold"></div>
+        <div class="swatch" data-color="#2ECC71" style="background:#2ECC71;" onclick="gPickColor(this)" title="Green"></div>
+        <div class="swatch" data-color="#5B8DEF" style="background:#5B8DEF;" onclick="gPickColor(this)" title="Blue"></div>
+        <div class="swatch" data-color="#E74C3C" style="background:#E74C3C;" onclick="gPickColor(this)" title="Red"></div>
+        <div class="swatch" data-color="#BDC3C7" style="background:#BDC3C7;" onclick="gPickColor(this)" title="Silver"></div>
+        <div class="swatch" data-color="#9B59B6" style="background:#9B59B6;" onclick="gPickColor(this)" title="Purple"></div>
+      </div>
+    </div>
+
+    <div class="sid-section">
+      <div class="sid-label">Actions</div>
+      <button class="gen-graphic-btn" id="gGenBtn" onclick="generate()">Generate Graphic →</button>
+      <button class="dl-btn" id="dlBtn" onclick="downloadCanvas()">⬇ Download PNG</button>
+    </div>
+  </aside>
+
+  <!-- Centre: input fields (swapped by template) -->
+  <main class="gmain">
+    <div class="gmain-title">Instagram <em>Graphic Generator</em></div>
+    <div class="gmain-sub">Design professional finance graphics for your feed. Choose a template, fill in your content, and download a print-ready PNG.</div>
+
+    <!-- POST FIELDS -->
+    <div id="postFields">
+      <div class="field-group">
+        <div class="field-group-title">Header</div>
+        <div class="field-row">
+          <label class="field-label">Topic / Tip Title</label>
+          <input class="finput" id="p_title" placeholder="e.g. What Is a Leveraged Buyout?" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Hero Metric</div>
+        <div class="field-row">
+          <label class="field-label">Main Number or Stat</label>
+          <input class="finput" id="p_stat" placeholder="e.g. $4.2B" />
+        </div>
+        <div class="field-row">
+          <label class="field-label">Metric Label</label>
+          <input class="finput" id="p_statLabel" placeholder="e.g. Deal Size" />
+        </div>
+        <div class="field-row">
+          <label class="field-label">Context Line</label>
+          <input class="finput" id="p_context" placeholder="e.g. KKR's acquisition of X Corp in Q1 2025" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">3 Stat Chips</div>
+        <div class="field-row">
+          <label class="field-label">Chip 1</label>
+          <div class="chip-pair">
+            <input class="finput" id="p_c1v" placeholder="5.2×" />
+            <input class="finput" id="p_c1l" placeholder="MOIC" />
+          </div>
+        </div>
+        <div class="field-row">
+          <label class="field-label">Chip 2</label>
+          <div class="chip-pair">
+            <input class="finput" id="p_c2v" placeholder="3 yrs" />
+            <input class="finput" id="p_c2l" placeholder="Hold Period" />
+          </div>
+        </div>
+        <div class="field-row">
+          <label class="field-label">Chip 3</label>
+          <div class="chip-pair">
+            <input class="finput" id="p_c3v" placeholder="28%" />
+            <input class="finput" id="p_c3l" placeholder="IRR" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REEL FIELDS -->
+    <div id="reelFields" style="display:none;">
+
+      <!-- ZONE 1: HOOK -->
+      <div class="field-group">
+        <div class="field-group-title">① Hook Line <span style="color:var(--text3);font-size:9px;font-family:'Barlow',sans-serif;text-transform:none;letter-spacing:0;font-weight:400;">— first thing viewer sees, scroll-stopper</span></div>
+        <div class="field-row">
+          <label class="field-label">Hook — Line 1 (white)</label>
+          <input class="finput" id="r_h1" placeholder="e.g. How Blackstone" />
+        </div>
+        <div class="field-row">
+          <label class="field-label">Hook — Line 2 (accent colour)</label>
+          <input class="finput" id="r_h2" placeholder="e.g. Made $10 Billion" />
+        </div>
+        <div class="field-row">
+          <label class="field-label">Hook Sub-line (small, muted)</label>
+          <input class="finput" id="r_hsub" placeholder="e.g. The deal that changed private equity forever" />
+        </div>
+        <div class="field-row">
+          <label class="field-label">Series / Brand Tag (top-left chip)</label>
+          <input class="finput" id="r_brand" placeholder="e.g. G7 Capital · PE Insights" />
+        </div>
+      </div>
+
+      <!-- ZONE 2: TEXT OVERLAYS (3 pages) -->
+      <div class="field-group">
+        <div class="field-group-title">② Text Overlay Pages <span style="color:var(--text3);font-size:9px;font-family:'Barlow',sans-serif;text-transform:none;letter-spacing:0;font-weight:400;">— each page = one reel screen</span></div>
+
+        <!-- Page 1 -->
+        <div style="background:var(--s3);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.18em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:10px;">Page 1</div>
+          <div class="field-row">
+            <label class="field-label">Label (small caps, muted)</label>
+            <input class="finput" id="r_p1label" placeholder="e.g. THE DEAL" />
+          </div>
+          <div class="field-row">
+            <label class="field-label">Bold Metric / Number (LARGE accent)</label>
+            <input class="finput" id="r_p1metric" placeholder="e.g. $6.9B" />
+          </div>
+          <div class="field-row" style="margin-bottom:0;">
+            <label class="field-label">Context line (supporting text)</label>
+            <input class="finput" id="r_p1text" placeholder="e.g. Acquisition of Hilton Hotels by Blackstone" />
+          </div>
+        </div>
+
+        <!-- Page 2 -->
+        <div style="background:var(--s3);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:10px;">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.18em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:10px;">Page 2</div>
+          <div class="field-row">
+            <label class="field-label">Label (small caps, muted)</label>
+            <input class="finput" id="r_p2label" placeholder="e.g. THE RETURN" />
+          </div>
+          <div class="field-row">
+            <label class="field-label">Bold Metric / Number (LARGE accent)</label>
+            <input class="finput" id="r_p2metric" placeholder="e.g. 26% IRR" />
+          </div>
+          <div class="field-row" style="margin-bottom:0;">
+            <label class="field-label">Context line (supporting text)</label>
+            <input class="finput" id="r_p2text" placeholder="e.g. Over an 11-year hold period — 3× equity multiple" />
+          </div>
+        </div>
+
+        <!-- Page 3 -->
+        <div style="background:var(--s3);border:1px solid var(--border);border-radius:6px;padding:12px 14px;">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.18em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:10px;">Page 3</div>
+          <div class="field-row">
+            <label class="field-label">Label (small caps, muted)</label>
+            <input class="finput" id="r_p3label" placeholder="e.g. THE LESSON" />
+          </div>
+          <div class="field-row">
+            <label class="field-label">Bold Metric / Number (LARGE accent)</label>
+            <input class="finput" id="r_p3metric" placeholder="e.g. $14B Exit" />
+          </div>
+          <div class="field-row" style="margin-bottom:0;">
+            <label class="field-label">Context line (supporting text)</label>
+            <input class="finput" id="r_p3text" placeholder="e.g. Operational improvements drove the entire upside" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ZONE 3: CTA -->
+      <div class="field-group">
+        <div class="field-group-title">③ Call To Action <span style="color:var(--text3);font-size:9px;font-family:'Barlow',sans-serif;text-transform:none;letter-spacing:0;font-weight:400;">— last slide, bottom strip</span></div>
+        <div class="field-row">
+          <label class="field-label">CTA Main Line</label>
+          <input class="finput" id="r_cta1" placeholder="e.g. Follow for daily PE & VC breakdowns" />
+        </div>
+        <div class="field-row" style="margin-bottom:0;">
+          <label class="field-label">CTA Sub Line (handle / hashtag)</label>
+          <input class="finput" id="r_cta2" placeholder="e.g. @gsevncapital · #PrivateEquity" />
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Right: Canvas preview -->
+  <aside class="gpanel">
+    <div class="gpanel-header">
+      <div class="gpanel-title">Live Preview</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="gpanel-dim" id="gDimLabel">1080 × 1080 px</div>
+        <!-- Reel page nav — only shown for reel template -->
+        <div id="reelPageNav" style="display:none;gap:4px;display:none;">
+          <button class="reel-nav-btn active" id="rpBtn0" onclick="gShowReelPage(0)">Hook</button>
+          <button class="reel-nav-btn" id="rpBtn1" onclick="gShowReelPage(1)">P1</button>
+          <button class="reel-nav-btn" id="rpBtn2" onclick="gShowReelPage(2)">P2</button>
+          <button class="reel-nav-btn" id="rpBtn3" onclick="gShowReelPage(3)">P3</button>
+          <button class="reel-nav-btn" id="rpBtn4" onclick="gShowReelPage(4)">CTA</button>
+        </div>
+      </div>
+    </div>
+    <div class="gpanel-body" id="gPanelBody">
+      <div class="preview-placeholder">
+        <div class="pe-icon">🖼</div>
+        <div class="pe-txt">Fill in the fields and click<br>"Generate Graphic →" to preview your design.</div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast">✓ Saved to Downloads!</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// GRAPHIC GENERATOR — all var + function() syntax
+// ══════════════════════════════════════════════════
+
+var gTemplate = 'post';
+var gAccent   = '#C9A84C';
+var gCanvas   = null;
+
+// ── Switch template ───────────────────────────────
+function gSwitchTemplate(t) {
+  gTemplate = t;
+  document.getElementById('tplPostBtn').className = 'tpl-btn' + (t === 'post' ? ' active' : '');
+  document.getElementById('tplReelBtn').className = 'tpl-btn' + (t === 'reel' ? ' active' : '');
+  document.getElementById('postFields').style.display = t === 'post' ? '' : 'none';
+  document.getElementById('reelFields').style.display = t === 'reel' ? '' : 'none';
+  document.getElementById('gDimLabel').textContent = t === 'post' ? '1080 × 1080 px' : '1080 × 1920 px';
+  document.getElementById('reelPageNav').style.display = 'none';
+  // hide old canvas
+  document.getElementById('gPanelBody').innerHTML =
+    '<div class="preview-placeholder"><div class="pe-icon">🖼</div>' +
+    '<div class="pe-txt">Fill in the fields and click<br>"Generate Graphic →" to preview your design.</div></div>';
+  var dlBtn = document.getElementById('dlBtn');
+  dlBtn.className = 'dl-btn';
+  dlBtn.textContent = t === 'post' ? '⬇ Download PNG' : '⬇ Download All 5 Slides';
+  gCanvas = null;
+  gReelCanvases = [];
+}
+
+// ── Pick accent colour ────────────────────────────
+function gPickColor(el) {
+  gAccent = el.getAttribute('data-color');
+  var all = document.querySelectorAll('#swatchRow .swatch');
+  for (var i = 0; i < all.length; i++) { all[i].classList.remove('active'); }
+  el.classList.add('active');
+}
+
+// ── Helpers ───────────────────────────────────────
+
+function hexToRgba(hex, alpha) {
+  var r = parseInt(hex.slice(1,3),16);
+  var g = parseInt(hex.slice(3,5),16);
+  var b = parseInt(hex.slice(5,7),16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function wrapText(ctx, text, x, y, maxW, lineH) {
+  var words = text.split(' ');
+  var line  = '';
+  var lines = [];
+  for (var n = 0; n < words.length; n++) {
+    var testLine  = line + words[n] + ' ';
+    var metrics   = ctx.measureText(testLine);
+    if (metrics.width > maxW && n > 0) {
+      lines.push(line.trim());
+      line = words[n] + ' ';
+    } else {
+      line = testLine;
+    }
+  }
+  lines.push(line.trim());
+  for (var i = 0; i < lines.length; i++) {
+    ctx.fillText(lines[i], x, y + i * lineH);
+  }
+  return lines.length;
+}
+
+function drawBg(ctx, W, H, accent) {
+  // Base dark fill
+  ctx.fillStyle = '#060606';
+  ctx.fillRect(0, 0, W, H);
+
+  // Radial glow 1 — top-left
+  var g1 = ctx.createRadialGradient(W * 0.15, H * 0.18, 0, W * 0.15, H * 0.18, W * 0.55);
+  g1.addColorStop(0, hexToRgba(accent, 0.12));
+  g1.addColorStop(1, 'transparent');
+  ctx.fillStyle = g1;
+  ctx.fillRect(0, 0, W, H);
+
+  // Radial glow 2 — bottom-right
+  var g2 = ctx.createRadialGradient(W * 0.85, H * 0.82, 0, W * 0.85, H * 0.82, W * 0.45);
+  g2.addColorStop(0, hexToRgba(accent, 0.08));
+  g2.addColorStop(1, 'transparent');
+  ctx.fillStyle = g2;
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle grid
+  ctx.strokeStyle = hexToRgba(accent, 0.04);
+  ctx.lineWidth = 1;
+  var step = Math.round(W / 18);
+  for (var x = 0; x <= W; x += step) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for (var y = 0; y <= H; y += step) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // 4px top colour stripe
+  ctx.fillStyle = accent;
+  ctx.fillRect(0, 0, W, 4);
+
+  // Thin border inset
+  ctx.strokeStyle = hexToRgba(accent, 0.18);
+  ctx.lineWidth = 2;
+  ctx.strokeRect(20, 20, W - 40, H - 40);
+}
+
+function drawWatermark(ctx, W, H, pad) {
+  ctx.save();
+  ctx.globalAlpha = 0.4;
+
+  // Circle bg
+  var cx = W - pad - 48;
+  var cy = H - pad - 20;
+
+  ctx.fillStyle = hexToRgba('#C9A84C', 0.15);
+  ctx.beginPath();
+  ctx.arc(cx, cy, 26, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Initial
+  ctx.fillStyle = '#C9A84C';
+  ctx.font = 'bold 20px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('G7', cx, cy);
+
+  // Name
+  ctx.font = '500 18px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#C9A84C';
+  ctx.fillText('G7 Capital', cx + 34, cy);
+
+  ctx.restore();
+}
+
+function setupCanvas(W, H) {
+  var existing = document.getElementById('gCanvas');
+  if (existing) { existing.parentNode.removeChild(existing); }
+
+  var cvs = document.createElement('canvas');
+  cvs.id = 'gCanvas';
+  cvs.width  = W;
+  cvs.height = H;
+
+  // Scale for preview: fit inside the panel
+  var maxPreviewW = 360;
+  var maxPreviewH = 560;
+  var scale = Math.min(maxPreviewW / W, maxPreviewH / H);
+  cvs.style.width  = Math.round(W * scale) + 'px';
+  cvs.style.height = Math.round(H * scale) + 'px';
+
+  return cvs;
+}
+
+// ── Draw Post (1080×1080) ─────────────────────────
+function drawPost(ctx, W, H, data, accent) {
+  drawBg(ctx, W, H, accent);
+
+  var pad = 72;
+
+  // Top brand line
+  ctx.font = '500 30px "DM Mono", monospace';
+  ctx.fillStyle = hexToRgba(accent, 0.7);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('G7 CAPITAL', pad, pad + 12);
+
+  // Divider line under brand
+  ctx.strokeStyle = hexToRgba(accent, 0.25);
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(pad, pad + 52);
+  ctx.lineTo(W - pad, pad + 52);
+  ctx.stroke();
+
+  // Title
+  ctx.font = 'bold 64px "Cormorant Garamond", Georgia, serif';
+  ctx.fillStyle = '#EAE6DC';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  var titleLines = wrapText(ctx, data.title || 'Finance Insight', pad, pad + 72, W - pad * 2, 76);
+
+  // Hero stat block
+  var statY = pad + 72 + titleLines * 76 + 36;
+
+  // Stat big number
+  ctx.font = 'bold 160px "Cormorant Garamond", Georgia, serif';
+  ctx.fillStyle = accent;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText(data.stat || '—', pad, statY);
+
+  // Stat label
+  ctx.font = '600 32px "Barlow", sans-serif';
+  ctx.fillStyle = hexToRgba('#EAE6DC', 0.55);
+  ctx.textBaseline = 'top';
+  ctx.fillText((data.statLabel || '').toUpperCase(), pad, statY + 168);
+
+  // Context line
+  ctx.font = '400 28px "Barlow", sans-serif';
+  ctx.fillStyle = hexToRgba('#EAE6DC', 0.45);
+  ctx.textBaseline = 'top';
+  wrapText(ctx, data.context || '', pad, statY + 210, W - pad * 2, 38);
+
+  // Horizontal rule before chips
+  var chipY = H - pad - 130;
+  ctx.strokeStyle = hexToRgba(accent, 0.2);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad, chipY - 30);
+  ctx.lineTo(W - pad, chipY - 30);
+  ctx.stroke();
+
+  // 3 stat chips
+  var chips = [
+    {val: data.c1v, lbl: data.c1l},
+    {val: data.c2v, lbl: data.c2l},
+    {val: data.c3v, lbl: data.c3l}
+  ];
+  var chipW = (W - pad * 2 - 32) / 3;
+  for (var i = 0; i < chips.length; i++) {
+    var cx = pad + i * (chipW + 16);
+    var cy = chipY;
+
+    // chip background
+    roundRect(ctx, cx, cy, chipW, 110, 10);
+    ctx.fillStyle = hexToRgba(accent, 0.08);
+    ctx.fill();
+    roundRect(ctx, cx, cy, chipW, 110, 10);
+    ctx.strokeStyle = hexToRgba(accent, 0.22);
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // chip value
+    ctx.font = 'bold 38px "Cormorant Garamond", Georgia, serif';
+    ctx.fillStyle = accent;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(chips[i].val || '—', cx + chipW / 2, cy + 44);
+
+    // chip label
+    ctx.font = '500 20px "Barlow", sans-serif';
+    ctx.fillStyle = hexToRgba('#EAE6DC', 0.5);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText((chips[i].lbl || '').toUpperCase(), cx + chipW / 2, cy + 84);
+  }
+
+  drawWatermark(ctx, W, H, pad - 12);
+}
+
+// ── Draw Reel — HOOK slide (slide 0) ──────────────
+function drawReelHook(ctx, W, H, data, accent) {
+  drawBg(ctx, W, H, accent);
+  var pad = 80;
+
+  // Brand chip — top left
+  var brandText = (data.brand || 'G7 CAPITAL · PE INSIGHTS').toUpperCase();
+  ctx.font = '500 26px "DM Mono", monospace';
+  var bw = ctx.measureText(brandText).width + 32;
+  roundRect(ctx, pad, pad, bw, 44, 5);
+  ctx.fillStyle = hexToRgba(accent, 0.12);
+  ctx.fill();
+  roundRect(ctx, pad, pad, bw, 44, 5);
+  ctx.strokeStyle = hexToRgba(accent, 0.35);
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.fillStyle = hexToRgba(accent, 0.85);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(brandText, pad + 16, pad + 22);
+
+  // Slide indicator — top right
+  ctx.font = '400 24px "DM Mono", monospace';
+  ctx.fillStyle = hexToRgba('#EAE6DC', 0.25);
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillText('1 / 5', W - pad, pad + 10);
+
+  var centreY = H * 0.30;
+  var lineH   = 118;
+  var textX   = pad + 28;
+  var maxW    = W - textX - pad;
+  var h1text  = data.h1 || 'Breaking';
+  var h2text  = data.h2 || 'Finance News';
+
+  // ── Measure line counts WITHOUT drawing ──────────
+  // Use a helper that just counts lines, never draws
+  function countLines(text, font) {
+    ctx.font = font;
+    var words = text.split(' ');
+    var line = '';
+    var count = 1;
+    for (var n = 0; n < words.length; n++) {
+      var test = line + words[n] + ' ';
+      if (ctx.measureText(test).width > maxW && n > 0) {
+        count++;
+        line = words[n] + ' ';
+      } else {
+        line = test;
+      }
+    }
+    return count;
+  }
+
+  var headFont = 'bold 108px "Cormorant Garamond", Georgia, serif';
+  var h1lines  = countLines(h1text, headFont);
+  var h2Y      = centreY + h1lines * lineH + 20;
+  var h2lines  = countLines(h2text, headFont);
+
+  // ── Draw accent vertical bar (sized correctly) ───
+  var barH = h1lines * lineH + 20 + h2lines * lineH;
+  ctx.fillStyle = accent;
+  ctx.fillRect(pad, centreY - 10, 5, barH + 10);
+
+  // ── Draw line 1 — white ──────────────────────────
+  ctx.font      = headFont;
+  ctx.fillStyle = '#EAE6DC';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  wrapText(ctx, h1text, textX, centreY, maxW, lineH);
+
+  // ── Draw line 2 — accent colour ──────────────────
+  ctx.font      = headFont;
+  ctx.fillStyle = accent;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  wrapText(ctx, h2text, textX, h2Y, maxW, lineH);
+
+  // ── Sub-line ─────────────────────────────────────
+  var subY = h2Y + h2lines * lineH + 32;
+  ctx.font      = '400 34px "Barlow", sans-serif';
+  ctx.fillStyle = hexToRgba('#EAE6DC', 0.42);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  wrapText(ctx, data.hsub || '', textX, subY, maxW, 46);
+
+  // Bottom scroll nudge
+  ctx.font      = '400 26px "Barlow", sans-serif';
+  ctx.fillStyle = hexToRgba(accent, 0.6);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('▼  Swipe to see the breakdown', W / 2, H - pad - 30);
+
+  drawWatermark(ctx, W, H, pad - 10);
+}
+
+// ── Draw Reel — OVERLAY slide (slides 1,2,3) ──────
+function drawReelOverlay(ctx, W, H, data, accent, pageNum) {
+  drawBg(ctx, W, H, accent);
+  var pad = 80;
+
+  // Slide indicator — top right
+  ctx.font = '400 24px "DM Mono", monospace';
+  ctx.fillStyle = hexToRgba('#EAE6DC', 0.25);
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillText((pageNum + 2) + ' / 5', W - pad, pad + 10);
+
+  // Page number pill — top left
+  ctx.font = '500 22px "DM Mono", monospace';
+  var pillTxt = 'POINT 0' + (pageNum + 1);
+  var pillW = ctx.measureText(pillTxt).width + 28;
+  roundRect(ctx, pad, pad, pillW, 38, 4);
+  ctx.fillStyle = hexToRgba(accent, 0.1);
+  ctx.fill();
+  roundRect(ctx, pad, pad, pillW, 38, 4);
+  ctx.strokeStyle = hexToRgba(accent, 0.3);
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = hexToRgba(accent, 0.7);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(pillTxt, pad + 14, pad + 19);
+
+  // Label — small caps muted, centred
+  ctx.font = '600 30px "Barlow", sans-serif';
+  ctx.fillStyle = hexToRgba('#EAE6DC', 0.38);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText((data.label || '').toUpperCase(), W / 2, H * 0.28);
+
+  // Thin rule under label
+  ctx.strokeStyle = hexToRgba(accent, 0.18);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad * 2, H * 0.28 + 44);
+  ctx.lineTo(W - pad * 2, H * 0.28 + 44);
+  ctx.stroke();
+
+  // ── HERO METRIC — auto-scale font so it never overflows ──
+  var metricText  = data.metric || '—';
+  var metricMaxW  = W - pad * 2.5;
+  var metricMaxSz = 220;
+  var metricMinSz = 80;
+  var metricSz    = metricMaxSz;
+
+  // Step font size down until text fits within metricMaxW
+  while (metricSz > metricMinSz) {
+    ctx.font = 'bold ' + metricSz + 'px "Cormorant Garamond", Georgia, serif';
+    if (ctx.measureText(metricText).width <= metricMaxW) { break; }
+    metricSz -= 10;
+  }
+
+  // If it still doesn't fit at minimum size, wrap into multiple lines
+  var metricCentreY = H * 0.50;
+  ctx.font      = 'bold ' + metricSz + 'px "Cormorant Garamond", Georgia, serif';
+  ctx.fillStyle = accent;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = hexToRgba(accent, 0.35);
+  ctx.shadowBlur  = 60;
+
+  if (ctx.measureText(metricText).width <= metricMaxW) {
+    // Single line — centred vertically
+    ctx.fillText(metricText, W / 2, metricCentreY);
+  } else {
+    // Wrap across lines with reduced line height
+    ctx.textBaseline = 'top';
+    var mLineH   = metricSz + 16;
+    var mWords   = metricText.split(' ');
+    var mLines   = [];
+    var mLine    = '';
+    for (var mi = 0; mi < mWords.length; mi++) {
+      var mTest = mLine + mWords[mi] + ' ';
+      if (ctx.measureText(mTest).width > metricMaxW && mi > 0) {
+        mLines.push(mLine.trim());
+        mLine = mWords[mi] + ' ';
+      } else {
+        mLine = mTest;
+      }
+    }
+    mLines.push(mLine.trim());
+    var mTotalH  = mLines.length * mLineH;
+    var mStartY  = metricCentreY - mTotalH / 2;
+    for (var ml = 0; ml < mLines.length; ml++) {
+      ctx.fillText(mLines[ml], W / 2, mStartY + ml * mLineH);
+    }
+  }
+
+  ctx.shadowBlur  = 0;
+  ctx.shadowColor = 'transparent';
+
+  // Thin rule below metric zone
+  ctx.strokeStyle = hexToRgba(accent, 0.18);
+  ctx.lineWidth   = 1;
+  ctx.beginPath();
+  ctx.moveTo(pad * 2, H * 0.64);
+  ctx.lineTo(W - pad * 2, H * 0.64);
+  ctx.stroke();
+
+  // Context text — supporting sentence, centred, readable
+  ctx.font      = '400 36px "Barlow", sans-serif';
+  ctx.fillStyle = hexToRgba('#EAE6DC', 0.65);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  wrapTextCentre(ctx, data.text || '', W / 2, H * 0.655, W - pad * 2.4, 50);
+
+  drawWatermark(ctx, W, H, pad - 10);
+}
+
+// helper: centre-aligned word wrap
+function wrapTextCentre(ctx, text, cx, y, maxW, lineH) {
+  var words = text.split(' ');
+  var line = '';
+  var lines = [];
+  for (var n = 0; n < words.length; n++) {
+    var test = line + words[n] + ' ';
+    if (ctx.measureText(test).width > maxW && n > 0) {
+      lines.push(line.trim());
+      line = words[n] + ' ';
+    } else {
+      line = test;
+    }
+  }
+  lines.push(line.trim());
+  for (var i = 0; i < lines.length; i++) {
+    ctx.fillText(lines[i], cx, y + i * lineH);
+  }
+  return lines.length;
+}
+
+// ── Draw Reel — CTA slide (slide 4) ───────────────
+function drawReelCTA(ctx, W, H, data, accent) {
+  drawBg(ctx, W, H, accent);
+  var pad = 80;
+
+  // Slide indicator
+  ctx.font = '400 24px "DM Mono", monospace';
+  ctx.fillStyle = hexToRgba('#EAE6DC', 0.25);
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillText('5 / 5', W - pad, pad + 10);
+
+  // Large G7 monogram — centred, faint background
+  ctx.font = 'bold 320px "Cormorant Garamond", Georgia, serif';
+  ctx.fillStyle = hexToRgba(accent, 0.06);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('G7', W / 2, H * 0.35);
+
+  // CTA main line — starts at 44% down, line height 92px
+  var ctaLineH = 92;
+  var ctaStartY = H * 0.44;
+  ctx.font = 'bold 76px "Cormorant Garamond", Georgia, serif';
+  ctx.fillStyle = '#EAE6DC';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  var ctaLines = wrapTextCentre(ctx, data.cta1 || 'Follow for daily PE & VC breakdowns', W / 2, ctaStartY, W - pad * 2, ctaLineH);
+
+  // Accent divider — sits 36px below the last CTA line
+  var divY = ctaStartY + ctaLines * ctaLineH + 36;
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(W / 2 - 80, divY);
+  ctx.lineTo(W / 2 + 80, divY);
+  ctx.stroke();
+
+  // CTA sub line — 28px below divider
+  ctx.font = '500 36px "Barlow", sans-serif';
+  ctx.fillStyle = hexToRgba(accent, 0.8);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText(data.cta2 || '@gsevncapital · #PrivateEquity', W / 2, divY + 28);
+
+  // Bottom CTA strip — full-width accent banner
+  var stripH = 130;
+  var stripY = H - stripH;
+  ctx.fillStyle = accent;
+  ctx.fillRect(0, stripY, W, stripH);
+
+  // Strip text
+  ctx.font = 'bold 44px "Barlow", sans-serif';
+  ctx.fillStyle = '#060606';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🔔  FOLLOW  @GSEVNCAPITAL', W / 2, stripY + stripH / 2);
+}
+
+// ── gReel canvases store ───────────────────────────
+var gReelCanvases = [];
+var gReelPage = 0;
+
+function gShowReelPage(idx) {
+  gReelPage = idx;
+  // update nav buttons
+  for (var i = 0; i <= 4; i++) {
+    var btn = document.getElementById('rpBtn' + i);
+    if (btn) { btn.className = 'reel-nav-btn' + (i === idx ? ' active' : ''); }
+  }
+  // update dots
+  var dots = document.querySelectorAll('.page-dot');
+  for (var d = 0; d < dots.length; d++) {
+    dots[d].className = 'page-dot' + (d === idx ? ' active' : '');
+  }
+  // swap canvas
+  var wraps = document.querySelectorAll('.canvas-wrap');
+  for (var w = 0; w < wraps.length; w++) {
+    wraps[w].style.display = w === idx ? '' : 'none';
+  }
+  gCanvas = gReelCanvases[idx] || null;
+}
+
+// ── Draw Reel — original single-slide kept as alias ─
+function drawReel(ctx, W, H, data, accent) {
+  drawReelHook(ctx, W, H, data, accent);
+}
+
+// ── Main generate() ───────────────────────────────
+function generate() {
+  var W, H;
+  if (gTemplate === 'post') {
+    W = 1080; H = 1080;
+  } else {
+    W = 1080; H = 1920;
+  }
+
+  if (gTemplate === 'post') {
+    var cvs = setupCanvas(W, H);
+    var ctx = cvs.getContext('2d');
+    var data = {
+      title:    document.getElementById('p_title').value || 'Finance Insight',
+      stat:     document.getElementById('p_stat').value  || '—',
+      statLabel:document.getElementById('p_statLabel').value || '',
+      context:  document.getElementById('p_context').value || '',
+      c1v:      document.getElementById('p_c1v').value || '—',
+      c1l:      document.getElementById('p_c1l').value || '',
+      c2v:      document.getElementById('p_c2v').value || '—',
+      c2l:      document.getElementById('p_c2l').value || '',
+      c3v:      document.getElementById('p_c3v').value || '—',
+      c3l:      document.getElementById('p_c3l').value || ''
+    };
+    drawPost(ctx, W, H, data, gAccent);
+
+    var body = document.getElementById('gPanelBody');
+    body.innerHTML = '';
+    var wrap = document.createElement('div');
+    wrap.className = 'canvas-wrap';
+    wrap.appendChild(cvs);
+    body.appendChild(wrap);
+    gCanvas = cvs;
+
+    // Hide reel nav
+    document.getElementById('reelPageNav').style.display = 'none';
+    document.getElementById('dlBtn').className = 'dl-btn visible';
+
+  } else {
+    // ── REEL: generate all 5 slides ──
+    var rdata = {
+      brand: document.getElementById('r_brand').value  || 'G7 Capital · PE Insights',
+      h1:    document.getElementById('r_h1').value     || 'Breaking',
+      h2:    document.getElementById('r_h2').value     || 'Finance News',
+      hsub:  document.getElementById('r_hsub').value   || '',
+      p1:    { label: document.getElementById('r_p1label').value,  metric: document.getElementById('r_p1metric').value, text: document.getElementById('r_p1text').value  },
+      p2:    { label: document.getElementById('r_p2label').value,  metric: document.getElementById('r_p2metric').value, text: document.getElementById('r_p2text').value  },
+      p3:    { label: document.getElementById('r_p3label').value,  metric: document.getElementById('r_p3metric').value, text: document.getElementById('r_p3text').value  },
+      cta1:  document.getElementById('r_cta1').value   || 'Follow for daily PE & VC breakdowns',
+      cta2:  document.getElementById('r_cta2').value   || '@gsevncapital · #PrivateEquity'
+    };
+
+    gReelCanvases = [];
+    var pageLabels = ['Hook', 'P1', 'P2', 'P3', 'CTA'];
+
+    // Slide 0 — Hook
+    var c0 = setupCanvas(W, H); drawReelHook(c0.getContext('2d'), W, H, rdata, gAccent); gReelCanvases.push(c0);
+    // Slide 1,2,3 — Overlays
+    var overlayPages = [rdata.p1, rdata.p2, rdata.p3];
+    for (var i = 0; i < 3; i++) {
+      var cv = setupCanvas(W, H);
+      drawReelOverlay(cv.getContext('2d'), W, H, overlayPages[i], gAccent, i);
+      gReelCanvases.push(cv);
+    }
+    // Slide 4 — CTA
+    var c4 = setupCanvas(W, H); drawReelCTA(c4.getContext('2d'), W, H, rdata, gAccent); gReelCanvases.push(c4);
+
+    // Render into preview panel
+    var body = document.getElementById('gPanelBody');
+    body.innerHTML = '';
+    for (var j = 0; j < gReelCanvases.length; j++) {
+      var wrap = document.createElement('div');
+      wrap.className = 'canvas-wrap';
+      wrap.style.display = j === 0 ? '' : 'none';
+      wrap.appendChild(gReelCanvases[j]);
+      body.appendChild(wrap);
+    }
+
+    // Page dots
+    var dotsDiv = document.createElement('div');
+    dotsDiv.className = 'page-dots';
+    var dotLabels = ['Hook', 'P1', 'P2', 'P3', 'CTA'];
+    for (var d = 0; d < 5; d++) {
+      var dot = document.createElement('div');
+      dot.className = 'page-dot' + (d === 0 ? ' active' : '');
+      dot.title = dotLabels[d];
+      dot.setAttribute('onclick', 'gShowReelPage(' + d + ')');
+      dotsDiv.appendChild(dot);
+    }
+    body.appendChild(dotsDiv);
+
+    gCanvas = gReelCanvases[0];
+    gReelPage = 0;
+
+    // Show reel nav, update buttons
+    var nav = document.getElementById('reelPageNav');
+    nav.style.display = 'flex';
+    for (var k = 0; k <= 4; k++) {
+      var nbtn = document.getElementById('rpBtn' + k);
+      if (nbtn) { nbtn.className = 'reel-nav-btn' + (k === 0 ? ' active' : ''); }
+    }
+    document.getElementById('dlBtn').className = 'dl-btn visible';
+    document.getElementById('dlBtn').textContent = '⬇ Download All 5 Slides as ZIP';
+  }
+}
+
+// ── Pure-JS ZIP builder (DataView / pre-allocated buffer) ────
+// Writes directly into a single ArrayBuffer — no array concat,
+// no Array.from on large blobs. Mac Archive Utility compatible.
+
+var _crc32Table = null;
+function getCRC32Table() {
+  if (_crc32Table) { return _crc32Table; }
+  _crc32Table = new Uint32Array(256);
+  for (var i = 0; i < 256; i++) {
+    var c = i;
+    for (var k = 0; k < 8; k++) { c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); }
+    _crc32Table[i] = c;
+  }
+  return _crc32Table;
+}
+
+function crc32(buf) {
+  var t   = getCRC32Table();
+  var crc = 0xFFFFFFFF >>> 0;
+  for (var i = 0; i < buf.length; i++) {
+    crc = (t[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8)) >>> 0;
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+function buildZip(files) {
+  // ── Pass 1: compute sizes & CRCs ──────────────────
+  var LFH      = 30; // local file header fixed part
+  var CDFH     = 46; // central dir fixed part
+  var EOCD_SZ  = 22;
+
+  var metas = [];
+  var totalSize = 0;
+  var cdSize    = 0;
+
+  for (var i = 0; i < files.length; i++) {
+    var nameLen  = files[i].name.length;
+    var dataLen  = files[i].data.length;
+    var checksum = crc32(files[i].data);
+    var localOff = totalSize;
+    var localSz  = LFH + nameLen + dataLen;
+
+    metas.push({ nameLen: nameLen, dataLen: dataLen, crc: checksum, localOff: localOff });
+    totalSize += localSz;
+    cdSize    += CDFH + nameLen;
+  }
+
+  var bufSize = totalSize + cdSize + EOCD_SZ;
+  var buf     = new ArrayBuffer(bufSize);
+  var view    = new DataView(buf);
+  var bytes   = new Uint8Array(buf);
+  var pos     = 0;
+
+  function writeU16(v) { view.setUint16(pos, v, true); pos += 2; }
+  function writeU32(v) { view.setUint32(pos, v, true); pos += 4; }
+  function writeBytes(src) { bytes.set(src, pos); pos += src.length; }
+  function writeName(name) {
+    for (var c = 0; c < name.length; c++) { bytes[pos++] = name.charCodeAt(c) & 0xFF; }
+  }
+
+  // ── Pass 2: write local file entries ──────────────
+  for (var i = 0; i < files.length; i++) {
+    var m    = metas[i];
+    var name = files[i].name;
+    var data = files[i].data;
+
+    writeU32(0x04034B50); // local file header sig
+    writeU16(20);         // version needed
+    writeU16(0);          // flags
+    writeU16(0);          // compression: stored
+    writeU16(0);          // mod time
+    writeU16(0x4A21);     // mod date
+    writeU32(m.crc);
+    writeU32(m.dataLen);  // compressed size
+    writeU32(m.dataLen);  // uncompressed size
+    writeU16(m.nameLen);
+    writeU16(0);          // extra field len
+    writeName(name);
+    writeBytes(data);
+  }
+
+  // ── Pass 3: write central directory ───────────────
+  var cdStart = pos;
+  for (var i = 0; i < files.length; i++) {
+    var m    = metas[i];
+    var name = files[i].name;
+
+    writeU32(0x02014B50); // central dir sig
+    writeU16(20);         // version made by
+    writeU16(20);         // version needed
+    writeU16(0);          // flags
+    writeU16(0);          // compression
+    writeU16(0);          // mod time
+    writeU16(0x4A21);     // mod date
+    writeU32(m.crc);
+    writeU32(m.dataLen);  // compressed size
+    writeU32(m.dataLen);  // uncompressed size
+    writeU16(m.nameLen);
+    writeU16(0);          // extra len
+    writeU16(0);          // comment len
+    writeU16(0);          // disk start
+    writeU16(0);          // internal attr
+    writeU32(0);          // external attr
+    writeU32(m.localOff); // offset of local header
+    writeName(name);
+  }
+
+  // ── Pass 4: end of central directory ──────────────
+  var actualCdSize = pos - cdStart;
+  writeU32(0x06054B50); // EOCD sig
+  writeU16(0);          // disk number
+  writeU16(0);          // disk with CD
+  writeU16(files.length);
+  writeU16(files.length);
+  writeU32(actualCdSize);
+  writeU32(cdStart);
+  writeU16(0);          // comment len
+
+  return bytes;
+}
+
+function canvasToUint8Array(cvs, callback) {
+  cvs.toBlob(function(blob) {
+    var reader    = new FileReader();
+    reader.onload = function() { callback(new Uint8Array(reader.result)); };
+    reader.readAsArrayBuffer(blob);
+  }, 'image/png');
+}
+
+// ── Download ──────────────────────────────────────
+function downloadCanvas() {
+  if (gTemplate === 'post') {
+    if (!gCanvas) { return; }
+    var filename = 'gsevncapital-post-' + Date.now() + '.png';
+    gCanvas.toBlob(function(blob) {
+      var url = URL.createObjectURL(blob);
+      var a   = document.createElement('a');
+      a.href  = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function() { URL.revokeObjectURL(url); }, 3000);
+      showToast('✓ Post saved to Downloads!');
+    }, 'image/png');
+
+  } else {
+    // Build a real ZIP with all 5 slides
+    if (!gReelCanvases.length) { return; }
+
+    var dlBtn = document.getElementById('dlBtn');
+    dlBtn.textContent = '⏳ Building ZIP…';
+    dlBtn.disabled    = true;
+
+    var names     = ['01-hook.png','02-page1.png','03-page2.png','04-page3.png','05-cta.png'];
+    var collected = [];
+    var total     = gReelCanvases.length;
+
+    function collectOne(i) {
+      if (i >= total) {
+        // All collected — build ZIP and trigger single download
+        var files = [];
+        for (var f = 0; f < total; f++) {
+          files.push({ name: names[f], data: collected[f] });
+        }
+        var zipBytes = buildZip(files);
+        var blob     = new Blob([zipBytes], { type: 'application/zip' });
+        var url      = URL.createObjectURL(blob);
+        var a        = document.createElement('a');
+        a.href       = url;
+        a.download   = 'gsevncapital-reel-' + Date.now() + '.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
+
+        dlBtn.textContent = '⬇ Download All 5 Slides as ZIP';
+        dlBtn.disabled    = false;
+        showToast('✓ ZIP downloaded — 5 slides inside!');
+        return;
+      }
+      canvasToUint8Array(gReelCanvases[i], function(bytes) {
+        collected[i] = bytes;
+        collectOne(i + 1);
+      });
+    }
+
+    collectOne(0);
+  }
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg || '✓ Saved to Downloads!';
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2800);
+}
+
+// ── Hook graphic tab into main tab switcher ───────
+// Patch the existing switchMainTab to also toggle graphic workspace
+var _origSwitchMainTab = switchMainTab;
+switchMainTab = function(el, id) {
+  var gw = document.getElementById('graphicWorkspace');
+  var ws = document.querySelector('.workspace');
+  if (id === 'graphic') {
+    document.querySelectorAll('.tabs .tab').forEach(function(t) { t.classList.remove('active'); });
+    el.classList.add('active');
+    ws.classList.add('hidden');
+    gw.classList.add('visible');
+  } else {
+    ws.classList.remove('hidden');
+    gw.classList.remove('visible');
+    _origSwitchMainTab(el, id);
+  }
+};
+</script>
+</body>
+</html>
