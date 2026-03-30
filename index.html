@@ -1700,24 +1700,37 @@ var ND_QUERIES = {
 async function fetchFromNewsData(topics) {
   var ndKey = getNewsDataKey();
   if (!ndKey) return [];
-  var query = topics.slice(0, 3).map(function(t) { return ND_QUERIES[t] || t; }).join(' OR ');
-  var url = 'https://newsdata.io/api/1/latest?apikey=' + ndKey + '&q=' + encodeURIComponent(query) + '&language=en&category=business&size=10';
-  var res = await fetch(url);
-  if (!res.ok) return [];
-  var data = await res.json();
-  if (data.status !== 'success' || !data.results) return [];
-  return data.results.map(function(item) {
-    var pub = item.pubDate ? new Date(item.pubDate) : new Date();
-    var h = Math.max(1, Math.round((Date.now() - pub.getTime()) / 3600000));
-    return {
-      title: (item.title || '').replace(/\s*-\s*[^-]*$/, '').trim(),
-      source: item.source_name || item.source_id || 'News',
-      link: item.link || '',
-      description: item.description || '',
-      time: h < 24 ? h + 'h ago' : Math.floor(h / 24) + 'd ago',
-      dateStr: pub.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-    };
-  }).filter(function(item) { return item.title.length > 10; });
+  var allItems = [];
+  // Fetch each topic separately with a short query
+  for (var i = 0; i < topics.length; i++) {
+    var q = ND_QUERIES[topics[i]] || topics[i];
+    // Use only the first part of the query to stay within limits
+    var shortQ = q.split(' OR ').slice(0, 2).join(' OR ');
+    var url = 'https://newsdata.io/api/1/latest?apikey=' + ndKey + '&q=' + encodeURIComponent(shortQ) + '&language=en&category=business&size=3';
+    try {
+      var res = await fetch(url);
+      if (!res.ok) continue;
+      var data = await res.json();
+      if (data.status !== 'success' || !data.results) continue;
+      data.results.forEach(function(item) {
+        var pub = item.pubDate ? new Date(item.pubDate) : new Date();
+        var h = Math.max(1, Math.round((Date.now() - pub.getTime()) / 3600000));
+        var title = (item.title || '').replace(/\s*-\s*[^-]*$/, '').trim();
+        if (title.length > 10) {
+          allItems.push({
+            title: title,
+            source: item.source_name || item.source_id || 'News',
+            link: item.link || '',
+            description: item.description || '',
+            time: h < 24 ? h + 'h ago' : Math.floor(h / 24) + 'd ago',
+            dateStr: pub.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            _topic: topics[i]
+          });
+        }
+      });
+    } catch(e) { continue; }
+  }
+  return allItems;
 }
 
 // ── Source 2: Google News RSS (FREE, no key) ──
@@ -1731,7 +1744,7 @@ var RSS_QUERIES = {
 
 async function fetchFromGoogleRSS(topics) {
   var items = [];
-  for (var i = 0; i < Math.min(topics.length, 2); i++) {
+  for (var i = 0; i < topics.length; i++) {
     var q = RSS_QUERIES[topics[i]] || topics[i];
     var feedUrl = 'https://news.google.com/rss/search?hl=en-US&gl=US&ceid=US:en&q=' + encodeURIComponent(q + ' when:3d');
     var proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(feedUrl);
@@ -1755,7 +1768,8 @@ async function fetchFromGoogleRSS(topics) {
           link: link,
           description: '',
           time: h < 24 ? h + 'h ago' : Math.floor(h / 24) + 'd ago',
-          dateStr: pub.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+          dateStr: pub.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+          _topic: topics[i]
         });
       });
     } catch(e) { continue; }
@@ -1812,7 +1826,7 @@ async function fetchNews() {
       try {
         document.getElementById('fetchTxt').textContent = '① Fetching real news...';
         var ndArticles = await fetchFromNewsData(selected);
-        if (ndArticles.length >= 3) {
+        if (ndArticles.length >= 1) {
           document.getElementById('fetchTxt').textContent = '① Scoring stories...';
           parsed = await scoreArticles(ndArticles, topicNames, seriesOpt.join(', '), apiKey);
           if (parsed && parsed.length > 0) sourceUsed = 'NewsData.io ✓ Real';
@@ -1825,7 +1839,7 @@ async function fetchNews() {
       try {
         document.getElementById('fetchTxt').textContent = '② Google News RSS...';
         var rssArticles = await fetchFromGoogleRSS(selected);
-        if (rssArticles.length >= 3) {
+        if (rssArticles.length >= 1) {
           document.getElementById('fetchTxt').textContent = '② Scoring stories...';
           parsed = await scoreArticles(rssArticles, topicNames, seriesOpt.join(', '), apiKey);
           if (parsed && parsed.length > 0) sourceUsed = 'Google News ✓ Real';
